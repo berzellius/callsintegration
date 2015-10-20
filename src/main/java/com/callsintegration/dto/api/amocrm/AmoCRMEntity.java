@@ -9,4 +9,14 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class AmoCRMEntity {
+
+    private Long last_modified;
+
+    public Long getLast_modified() {
+        return last_modified;
+    }
+
+    public void setLast_modified(Long last_modified) {
+        this.last_modified = last_modified;
+    }
 }

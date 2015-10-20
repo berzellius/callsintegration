@@ -1,5 +1,6 @@
-package com.callsintegration.dto.api.amocrm;
+package com.callsintegration.dto.api.amocrm.request;
 
+import com.callsintegration.dto.api.amocrm.AmoCRMEntities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -16,8 +17,8 @@ public class AmoCRMContactPostRequest extends AmoCRMEntityPostRequest {
         return contacts;
     }
 
+
     public void setContacts(AmoCRMEntities contacts) {
         this.contacts = contacts;
     }
-
 }

@@ -1,4 +1,4 @@
-package com.callsintegration.dto.api.amocrm;
+package com.callsintegration.dto.api.amocrm.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

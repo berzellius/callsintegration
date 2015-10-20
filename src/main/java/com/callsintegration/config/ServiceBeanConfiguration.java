@@ -18,6 +18,8 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.ResourceBundleViewResolver;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -90,7 +92,7 @@ public class ServiceBeanConfiguration {
 
         callTrackingAPIService.setLogin("info@home-motion.ru");
         callTrackingAPIService.setPassword("SsX0d1XE75");
-        Integer[] projects = {3901};
+        Integer[] projects = {3901, 3400};
         callTrackingAPIService.setProjects(projects);
 
         return callTrackingAPIService;
@@ -99,6 +101,49 @@ public class ServiceBeanConfiguration {
     @Bean
     public CallsService callsService(){
         return new CallsServiceImpl();
+    }
+
+    @Bean
+    public AmoCRMService amoCRMService(){
+        AmoCRMService amoCRMService = new AmoCRMServiceImpl();
+        amoCRMService.setUserLogin("elektro-karniz@yandex.ru");
+        amoCRMService.setUserHash("e45c8a138cfb6ac531ab61708d2fbb71");
+        amoCRMService.setLoginUrl("https://elektrokarniz.amocrm.ru/private/api/auth.php?type=json");
+        amoCRMService.setApiBaseUrl("https://elektrokarniz.amocrm.ru/private/api/v2/json/");
+
+        ArrayList<Long> leadClosedStatusesIds = new ArrayList<>();
+        leadClosedStatusesIds.add(142l);
+        leadClosedStatusesIds.add(143l);
+
+        amoCRMService.setLeadClosedStatusesIDs(leadClosedStatusesIds);
+
+        return amoCRMService;
+    }
+
+    @Bean
+    public IncomingCallBusinessProcess incomingCallBusinessProcess(){
+        IncomingCallBusinessProcessImpl incomingCallBusinessProcess = new IncomingCallBusinessProcessImpl();
+
+        incomingCallBusinessProcess.setDefaultUserId(543159l);
+        incomingCallBusinessProcess.setPhoneNumberCustomField(561024l);
+        incomingCallBusinessProcess.setPhoneNumberCustomFieldLeads(561026l);
+        incomingCallBusinessProcess.setMarketingChannelContactsCustomField(561442l);
+        incomingCallBusinessProcess.setMarketingChannelLeadsCustomField(561440l);
+        incomingCallBusinessProcess.setSourceContactsCustomField(561446l);
+        incomingCallBusinessProcess.setSourceLeadsCustomField(561444l);
+
+        HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
+        projectIdToContactsSource.put(3901, 1324018l);
+        projectIdToContactsSource.put(3400, 1324020l);
+
+        HashMap<Integer, Long> projectIdToLeadsSource = new HashMap<>();
+        projectIdToLeadsSource.put(3901, 1324014l);
+        projectIdToLeadsSource.put(3400, 1324016l);
+
+        incomingCallBusinessProcess.setProjectIdToContactsSource(projectIdToContactsSource);
+        incomingCallBusinessProcess.setProjectIdToLeadsSource(projectIdToLeadsSource);
+
+        return incomingCallBusinessProcess;
     }
 
 }

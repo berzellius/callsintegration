@@ -11,6 +11,7 @@ import java.util.ArrayList;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AmoCRMCustomField {
+    public AmoCRMCustomField(){}
 
     public AmoCRMCustomField(Long id, ArrayList<AmoCRMCustomFieldValue> values){
         this.setId(id);
@@ -18,6 +19,7 @@ public class AmoCRMCustomField {
     }
 
     private Long id;
+    private String code;
     private ArrayList<AmoCRMCustomFieldValue> values;
 
     public Long getId() {
@@ -34,5 +36,13 @@ public class AmoCRMCustomField {
 
     public void setValues(ArrayList<AmoCRMCustomFieldValue> values) {
         this.values = values;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

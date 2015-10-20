@@ -157,6 +157,8 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
             CallTrackingData callTrackingData = this.getData(params);
             for(Call call : callTrackingData.getData()){
+                call.setState(Call.State.NEW);
+                call.setProjectId(project);
                 calls.add(call);
             }
         }

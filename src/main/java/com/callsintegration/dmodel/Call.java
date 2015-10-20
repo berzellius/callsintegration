@@ -32,6 +32,8 @@ public class Call extends DModelEntityFiscalable {
     @Column(updatable = false, insertable = false, columnDefinition = "bigint")
     private Long id;
 
+    private Integer projectId;
+
     public Status getStatus() {
         return status;
     }
@@ -46,6 +48,22 @@ public class Call extends DModelEntityFiscalable {
 
     public void setDt(Date dt) {
         this.dt = dt;
+    }
+
+    public Integer getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
+    }
+
+    /*
+     * Состояние в контексте обработки входящих звонков
+     */
+    public static enum State {
+        NEW,
+        DONE
     }
 
     public static enum Status {
@@ -93,6 +111,9 @@ public class Call extends DModelEntityFiscalable {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private State state;
 
     @ElementCollection
     @CollectionTable(name = "calls_params", joinColumns = @JoinColumn(name = "id"))
@@ -147,5 +168,13 @@ public class Call extends DModelEntityFiscalable {
 
     public void setParams(Map<String, String> params) {
         this.params = params;
+    }
+
+    public State getState(){
+        return this.state;
+    }
+
+    public void setState(State state){
+        this.state = state;
     }
 }

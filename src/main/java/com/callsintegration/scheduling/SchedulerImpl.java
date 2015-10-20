@@ -25,6 +25,9 @@ public class SchedulerImpl implements MainScheduler {
     @Autowired
     Job callsImportJob;
 
+    @Autowired
+    Job newCallsToCRMJob;
+
     @Scheduled(fixedDelay = 60000)
     @Override
     public void callsImportProcess(){
@@ -35,6 +38,27 @@ public class SchedulerImpl implements MainScheduler {
 
         try {
             jobLauncher.run(callsImportJob, jobParametersBuilder.toJobParameters());
+        } catch (JobExecutionAlreadyRunningException e) {
+            e.printStackTrace();
+        } catch (JobRestartException e) {
+            e.printStackTrace();
+        } catch (JobInstanceAlreadyCompleteException e) {
+            e.printStackTrace();
+        } catch (JobParametersInvalidException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Scheduled(fixedDelay = 30000)
+    @Override
+    public void callsToCRM(){
+        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+        jobParametersBuilder.addDate("start", new Date());
+
+        System.out.println("START calls to CRM job!");
+
+        try {
+            jobLauncher.run(newCallsToCRMJob, jobParametersBuilder.toJobParameters());
         } catch (JobExecutionAlreadyRunningException e) {
             e.printStackTrace();
         } catch (JobRestartException e) {
