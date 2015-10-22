@@ -25,14 +25,19 @@ public class CallsServiceImpl implements CallsService {
 
     @Override
     public Long callsAlreadyLoaded() {
-        return callRepository.count(CallSpecifications.byDate(new Date()));
+        return callRepository.count(CallSpecifications.byDates(new Date(), new Date()));
     }
 
     @Override
     public Long callsAlreadyLoaded(Integer projectId) {
+        return callsAlreadyLoaded(projectId, null, null);
+    }
+
+    @Override
+    public Long callsAlreadyLoaded(Integer project, Date from, Date to) {
         Long count = callRepository.count(
-            Specifications.where(CallSpecifications.byDate(new Date()))
-                    .and(CallSpecifications.byProjectId(projectId))
+                Specifications.where(CallSpecifications.byDates((from != null)? from : new Date(), (to != null)? to : new Date()))
+                        .and(CallSpecifications.byProjectId(project))
         );
         return count;
     }

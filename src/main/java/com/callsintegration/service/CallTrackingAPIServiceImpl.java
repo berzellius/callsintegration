@@ -166,7 +166,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
         List<Call> calls = new LinkedList<>();
 
         for(Integer project : this.projects){
-            Long startIndex = callsService.callsAlreadyLoaded(project);
+            Long startIndex = callsService.callsAlreadyLoaded(project, from, to);
             MultiValueMap<String, String> params = apiParams(from, to, startIndex, maxResults);
             params.add("project", project.toString());
 

@@ -17,12 +17,12 @@ import java.util.TimeZone;
  */
 public class CallSpecifications {
 
-    public static Specification<Call> byDate(final Date date){
+    public static Specification<Call> byDates(final Date date1, final Date date2){
         return new Specification<Call>() {
             @Override
             public Predicate toPredicate(Root<Call> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
                 Calendar dtFromCal = Calendar.getInstance();
-                dtFromCal.setTime(date);
+                dtFromCal.setTime(date1);
                 dtFromCal.set(Calendar.HOUR_OF_DAY, 0);
                 dtFromCal.set(Calendar.MINUTE, 0);
                 dtFromCal.set(Calendar.SECOND, 0);
@@ -32,7 +32,7 @@ public class CallSpecifications {
                 System.out.println("bound1: " + sdf.format(dtFromCal.getTime()));
 
                 Calendar dtToCal = Calendar.getInstance();
-                dtToCal.setTime(date);
+                dtToCal.setTime(date2);
                 dtToCal.set(Calendar.HOUR_OF_DAY, 23);
                 dtToCal.set(Calendar.MINUTE, 59);
                 dtToCal.set(Calendar.SECOND, 59);
