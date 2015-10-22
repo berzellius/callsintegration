@@ -80,7 +80,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     private HttpEntity<AmoCRMRequest> jsonHttpEntity(AmoCRMRequest req) throws APIAuthException {
 
         if (cookies == null) {
-           // this.logIn();
+            this.logIn();
         }
 
         HttpHeaders httpHeaders = new HttpHeaders();
