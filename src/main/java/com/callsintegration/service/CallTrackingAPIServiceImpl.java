@@ -1,10 +1,12 @@
 package com.callsintegration.service;
 
 import com.callsintegration.dmodel.Call;
+import com.callsintegration.dto.api.ErrorHandlers.APIRequestErrorException;
 import com.callsintegration.dto.api.calltracking.CallTrackingAuth;
 import com.callsintegration.dto.api.calltracking.CallTrackingData;
 import com.callsintegration.dto.api.calltracking.CallTrackingResponse;
 import com.callsintegration.exception.APIAuthException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -12,6 +14,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +28,9 @@ import java.util.List;
  */
 @Service
 public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
+
+    @Autowired
+    CallsService callsService;
 
     private String auth;
     private Integer[] projects = {};
@@ -40,6 +46,8 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     private String metrics = "ct:duration,ct:answer_time";
     private String dimensions = "ct:caller,ct:datetime,ct:source,ct:status";
+
+    private ResponseErrorHandler errorHandler;
 
 
     public Integer[] getProjects() {
@@ -71,6 +79,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     private RestTemplate getCallTrackingRestTemplate(){
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(this.errorHandler);
 
         MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
         FormHttpMessageConverter httpMessageConverter = new FormHttpMessageConverter();
@@ -117,12 +126,17 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     private <T> CallTrackingResponse request(String url, HttpMethod method, HttpEntity<MultiValueMap<String, String>> request, Class<T> cl) throws APIAuthException {
 
-        HttpEntity<T> response = this.getCallTrackingRestTemplate().exchange(
-                url, method, request, cl
-        );
+        try {
+            HttpEntity<T> response = this.getCallTrackingRestTemplate().exchange(
+                    url, method, request, cl
+            );
 
-
-        return (CallTrackingResponse) response.getBody();
+            return (CallTrackingResponse) response.getBody();
+        }
+        catch (APIRequestErrorException e){
+            System.out.println("request to calltracking failed with error: " + e.getParams().toString());
+            return null;
+        }
     }
 
     private MultiValueMap<String, String> apiParams(Date from, Date to, Long startIndex, Integer maxResults){
@@ -148,10 +162,11 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
 
     @Override
-    public List<Call> getCalls(Date from, Date to, Long startIndex, Integer maxResults) throws APIAuthException {
+    public List<Call> getCalls(Date from, Date to, Integer maxResults) throws APIAuthException {
         List<Call> calls = new LinkedList<>();
 
         for(Integer project : this.projects){
+            Long startIndex = callsService.callsAlreadyLoaded(project);
             MultiValueMap<String, String> params = apiParams(from, to, startIndex, maxResults);
             params.add("project", project.toString());
 
@@ -167,7 +182,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     @Override
     public List<Call> getCalls(Date from, Date to) throws APIAuthException {
-        return getCalls(from, to, null, null);
+        return getCalls(from, to, null);
     }
 
     private CallTrackingData getData(MultiValueMap<String, String> params) throws APIAuthException {
@@ -267,5 +282,10 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
     @Override
     public void setApiMethod(HttpMethod apiMethod) {
         this.apiMethod = apiMethod;
+    }
+
+    @Override
+    public void setErrorHandler(ResponseErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
     }
 }

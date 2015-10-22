@@ -16,6 +16,8 @@ public class AmoCRMResponse {
 
     private Integer server_time;
 
+    private String error;
+
     public Integer getServer_time() {
         return server_time;
     }
@@ -32,5 +34,13 @@ public class AmoCRMResponse {
         } catch (JsonProcessingException e) {
             return "{corrupted_data}";
         }
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

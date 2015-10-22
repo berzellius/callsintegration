@@ -7,16 +7,5 @@ import java.util.*;
  */
 public abstract class CommonProjectSettings implements ProjectSettings {
 
-    @Override
-    public final List<String> getAllowedFileMimeTypes(){
-        List<String> types = new LinkedList<String>();
-        types.add("image/png");
-        types.add("image/jpeg");
-        types.add("image/gif");
-        types.add("image/tiff");
-
-        return types;
-    }
-
 
 }

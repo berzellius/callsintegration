@@ -47,4 +47,14 @@ public class CallSpecifications {
         };
     }
 
+    public static Specification<Call> byProjectId(final Integer projectId) {
+        return new Specification<Call>() {
+            @Override
+            public Predicate toPredicate(Root<Call> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate projectIdPredicate = criteriaBuilder.equal(root.get("projectId"), projectId);
+
+                return projectIdPredicate;
+            }
+        };
+    }
 }

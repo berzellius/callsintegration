@@ -9,6 +9,15 @@ public interface MainScheduler {
     @Scheduled(fixedDelay = 120000)
     void callsImportProcess();
 
+    @Scheduled(fixedDelay = 180000)
+    void callsImportProcessMedium();
+
+    /*
+     * 450 сек = 7 минут 30 секунд
+     */
+    @Scheduled(fixedDelay = 450000)
+    void callsImportProcessRarely();
+
     @Scheduled(fixedDelay = 30000)
     void callsToCRM();
 }

@@ -10,4 +10,5 @@ public interface CallsService {
 
     public Long callsAlreadyLoaded();
 
+    Long callsAlreadyLoaded(Integer projectId);
 }

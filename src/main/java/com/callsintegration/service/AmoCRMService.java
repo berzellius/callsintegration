@@ -4,6 +4,7 @@ import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.response.*;
 import com.callsintegration.exception.APIAuthException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResponseErrorHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
  */
 @Service
 public interface AmoCRMService {
+    void logIn() throws APIAuthException;
+
     AmoCRMCreatedEntityResponse addContact(AmoCRMContact amoCRMContact) throws APIAuthException;
 
     AmoCRMCreatedContactsResponse editContacts(AmoCRMEntities amoCRMEntities) throws APIAuthException;
@@ -56,4 +59,8 @@ public interface AmoCRMService {
     ArrayList<Long> getLeadClosedStatusesIDs();
 
     void setLeadClosedStatusesIDs(ArrayList<Long> leadClosedStatusesIDs);
+
+    void setErrorHandler(ResponseErrorHandler errorHandler);
+
+    void setMaxRelogins(Integer maxRelogins);
 }

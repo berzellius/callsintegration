@@ -5,20 +5,20 @@
     <title>Интеграция Calltracking и AmoCRM</title>
 </head>
 <body>
-    <p>Главная страница системы интеграции Calltracking и AmoCRM.</p>
+    <p>Система интеграции Calltracking и AmoCRM.</p>
     <p><a href="https://calltracking.ru/">Calltracking.ru</a></p>
     <p><a href="http://www.amocrm.ru/">AmoCRM.ru</a></p>
 
 
     <table>
         <!--@thymesVar id="calls" type="com.callsintegration.dmodel.Call"-->
-        <tr th:each="call : ${calls}">
+        <!--tr th:each="call : ${calls}">
             <td th:text="${call.number}" />
             <td th:text="${call.dt}" />
             <td th:text="${call.source}" />
             <td th:text="${call.status}" />
             <td th:text="${call.params}" />
-        </tr>
+        </tr-->
      </table>
 </body>
 </html>

@@ -7,10 +7,6 @@ import java.util.LinkedHashMap;
  * Created by berz on 22.11.14.
  */
 public class LocalProjectSettings extends CommonProjectSettings {
-    @Override
-    public String getPathToUploads() {
-        return "C:\\projects\\uploads";
-    }
 
     @Override
     public HashMap<String, String> getDatabaseConnectionConfig() {
@@ -22,13 +18,5 @@ public class LocalProjectSettings extends CommonProjectSettings {
         return dbConnect;
     }
 
-    @Override
-    public String getSiteUrl() {
-        return "http://localhost:8080/";
-    }
 
-    @Override
-    public String fontsDirectoryLocation() {
-        return "c:/windows/fonts/";
-    }
 }

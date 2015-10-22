@@ -4,6 +4,7 @@ import com.callsintegration.dmodel.Call;
 import com.callsintegration.exception.APIAuthException;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResponseErrorHandler;
 
 import java.util.Date;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
 public interface CallTrackingAPIService {
     void setProjects(Integer[] projects);
 
-    List<Call> getCalls(Date from, Date to, Long startIndex, Integer maxResults) throws APIAuthException;
+    List<Call> getCalls(Date from, Date to, Integer maxResults) throws APIAuthException;
 
     List<Call> getCalls(Date from, Date to) throws APIAuthException;
 
@@ -42,4 +43,6 @@ public interface CallTrackingAPIService {
     HttpMethod getApiMethod();
 
     void setApiMethod(HttpMethod apiMethod);
+
+    void setErrorHandler(ResponseErrorHandler errorHandler);
 }

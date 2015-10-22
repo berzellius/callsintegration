@@ -1,6 +1,8 @@
 package com.callsintegration.batch;
 
 import com.callsintegration.dmodel.Call;
+import com.callsintegration.service.AmoCRMService;
+import com.callsintegration.service.CallTrackingAPIService;
 import com.callsintegration.service.IncomingCallBusinessProcess;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -38,6 +40,12 @@ public class NewCallsToCRMBatchConfiguration {
 
     @Autowired
     JobBuilderFactory jobBuilderFactory;
+
+    @Autowired
+    CallTrackingAPIService callTrackingAPIService;
+
+    @Autowired
+    AmoCRMService amoCRMService;
 
     @Bean
     public ItemReader<Call> callReader(){

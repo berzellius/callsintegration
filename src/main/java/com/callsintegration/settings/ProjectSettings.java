@@ -8,14 +8,7 @@ import java.util.List;
  */
 public interface ProjectSettings {
 
-    public String getPathToUploads();
-
     public HashMap<String, String> getDatabaseConnectionConfig();
 
-    public List<String> getAllowedFileMimeTypes();
-
-    public String getSiteUrl();
-
-    public String fontsDirectoryLocation();
 
 }

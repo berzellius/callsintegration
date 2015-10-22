@@ -42,11 +42,9 @@ public class CallTrackingCallsReader implements ItemReader<List<Call>> {
 
     @Override
     public List<Call> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        this.setStartIndex(callsService.callsAlreadyLoaded());
+        //this.setStartIndex(callsService.callsAlreadyLoaded());
 
-        System.out.println("read calls from " +  this.getStartIndex());
-
-        List<Call> calls = callTrackingAPIService.getCalls(this.getFrom(), this.getTo(), this.getStartIndex(), this.getMaxResults() );
+        List<Call> calls = callTrackingAPIService.getCalls(this.getFrom(), this.getTo(), this.getMaxResults() );
 
         System.out.println("read calls: " + calls);
 

@@ -43,19 +43,13 @@ public class IndexController extends BaseController {
 
     @RequestMapping
     public String indexPage(
-            Model model,
-            @RequestParam(value = "from", required = false)
-            Long from,
-            @RequestParam(value = "max", required = false)
-            Integer max,
-            @RequestParam(value = "testcall", required = false)
-            Long callToTestID
+            Model model
     ) throws ParseException {
 
 
-        model.addAttribute("calls", callRepository.findAll(
+        /*model.addAttribute("calls", callRepository.findAll(
                 CallSpecifications.byDate(new Date())
-        ));
+        ));*/
 
         /*try {
             AmoCRMContact amoCRMContact = new AmoCRMContact();
@@ -75,12 +69,12 @@ public class IndexController extends BaseController {
                     System.out.println("link: contact[" + link.getContact_id().toString() + "]<->lead[" + link.getLead_id().toString() + "]");
                 }
             }*/
-            if(callToTestID != null){
+            /*if(callToTestID != null){
                 Call call = callRepository.findOne(callToTestID);
                 if(call != null){
                     incomingCallBusinessProcess.newIncomingCall(call);
                 }
-            }
+            }*/
 
 
         return "index";

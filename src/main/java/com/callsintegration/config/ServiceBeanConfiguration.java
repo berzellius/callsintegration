@@ -1,10 +1,13 @@
 package com.callsintegration.config;
 
 
+import com.callsintegration.dto.api.ErrorHandlers.AmoCRMAPIRequestErrorHandler;
+import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHandler;
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
 import com.callsintegration.service.*;
 import com.callsintegration.settings.LocalProjectSettings;
 import com.callsintegration.settings.ProjectSettings;
+import com.callsintegration.settings.RemoteProjectSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -95,6 +98,9 @@ public class ServiceBeanConfiguration {
         Integer[] projects = {3901, 3400};
         callTrackingAPIService.setProjects(projects);
 
+        CalltrackingAPIRequestErrorHandler errorHandler = new CalltrackingAPIRequestErrorHandler();
+        callTrackingAPIService.setErrorHandler(errorHandler);
+
         return callTrackingAPIService;
     }
 
@@ -114,6 +120,10 @@ public class ServiceBeanConfiguration {
         ArrayList<Long> leadClosedStatusesIds = new ArrayList<>();
         leadClosedStatusesIds.add(142l);
         leadClosedStatusesIds.add(143l);
+
+        AmoCRMAPIRequestErrorHandler errorHandler = new AmoCRMAPIRequestErrorHandler();
+        amoCRMService.setErrorHandler(errorHandler);
+        amoCRMService.setMaxRelogins(5);
 
         amoCRMService.setLeadClosedStatusesIDs(leadClosedStatusesIds);
 

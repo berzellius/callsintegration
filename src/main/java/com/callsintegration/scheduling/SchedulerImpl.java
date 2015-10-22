@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -28,9 +29,7 @@ public class SchedulerImpl implements MainScheduler {
     @Autowired
     Job newCallsToCRMJob;
 
-    @Scheduled(fixedDelay = 60000)
-    @Override
-    public void callsImportProcess(){
+    public void runCallsImport(){
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addDate("start", new Date());
 
@@ -49,7 +48,56 @@ public class SchedulerImpl implements MainScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 30000)
+    public int hourOfDay(){
+        Date dt = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(dt);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
+        return hour;
+    }
+
+    /*
+     * 144 сек
+     */
+    @Scheduled(fixedDelay = 144000)
+    @Override
+    public void callsImportProcess(){
+        int hour = hourOfDay();
+
+        if(hour >= 10 && hour < 22) {
+            runCallsImport();
+        }
+    }
+
+    /*
+     * 1500 сек = 25 минут
+     */
+    @Scheduled(fixedDelay = 1500000)
+    @Override
+    public void callsImportProcessMedium(){
+        int hour = hourOfDay();
+
+        if((hour >= 22 && hour < 24) || (hour >= 6 && hour < 10)) {
+            runCallsImport();
+        }
+    }
+
+    /*
+     * 3600 сек = 60 минут
+     */
+    @Scheduled(fixedDelay = 3600000)
+    @Override
+    public void callsImportProcessRarely(){
+        int hour = hourOfDay();
+
+        if((hour >= 0 && hour < 8)) {
+            runCallsImport();
+        }
+    }
+
+
+    @Scheduled(fixedDelay = 60000)
     @Override
     public void callsToCRM(){
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();

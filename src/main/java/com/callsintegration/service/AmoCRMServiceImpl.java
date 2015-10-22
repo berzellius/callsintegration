@@ -1,5 +1,6 @@
 package com.callsintegration.service;
 
+import com.callsintegration.dto.api.ErrorHandlers.APIRequestErrorException;
 import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.auth.AmoCRMAuthResponse;
 import com.callsintegration.dto.api.amocrm.request.*;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -35,8 +37,14 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     private List<String> cookies;
 
+    private ResponseErrorHandler errorHandler;
 
-    private void logIn() throws APIAuthException {
+    private Integer maxRelogins;
+    private Integer relogins = 0;
+
+
+    @Override
+    public void logIn() throws APIAuthException {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders requestHeaders = new HttpHeaders();
 
@@ -72,12 +80,13 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     private HttpEntity<AmoCRMRequest> jsonHttpEntity(AmoCRMRequest req) throws APIAuthException {
 
         if (cookies == null) {
-            this.logIn();
+           // this.logIn();
         }
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.add("Cookie", String.join(";", this.cookies));
+
 
         HttpEntity<AmoCRMRequest> requestHttpEntity = new HttpEntity<>(req, httpHeaders);
 
@@ -97,7 +106,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
         if (
                 amoCRMCreatedContactsResponse.getResponse() == null ||
-                    amoCRMCreatedContactsResponse.getResponse().getContacts().getAdd().size() == 0
+                        amoCRMCreatedContactsResponse.getResponse().getContacts().getAdd().size() == 0
                 ) {
             throw new IllegalStateException("Контакт не создан! Пришел пустой ответ от AmoCRM API.");
         }
@@ -130,7 +139,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     @Override
     public AmoCRMCreatedNotesResponse addNoteToLead(AmoCRMNote amoCRMNote, AmoCRMLead amoCRMLead) throws APIAuthException {
-        if(amoCRMLead.getId() == null){
+        if (amoCRMLead.getId() == null) {
             throw new IllegalArgumentException("Передана не сохраненная в системе сделка!");
         }
 
@@ -147,7 +156,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
         HttpEntity<AmoCRMCreatedNotesResponse> amoCRMCreatedNotesResponseHttpEntity = request(amoCRMPostRequest, "notes/set", AmoCRMCreatedNotesResponse.class);
 
-        if(amoCRMCreatedNotesResponseHttpEntity.getBody() == null){
+        if (amoCRMCreatedNotesResponseHttpEntity.getBody() == null) {
             throw new IllegalStateException("Ошибка при добавлении заметок! Пустой ответ от  AmoCRM API");
         }
 
@@ -165,9 +174,9 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
         AmoCRMCreatedContactsResponse amoCRMCreatedContactsResponse = this.editContacts(amoCRMEntities);
 
-        if(
+        if (
                 amoCRMCreatedContactsResponse.getResponse() == null
-                ){
+                ) {
             throw new IllegalStateException(
                     "Ошибка при добавлении контактов к сделке. Пустой ответ от AmoCRM! Response: " +
                             amoCRMCreatedContactsResponse.toString()
@@ -335,40 +344,59 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     private <T> HttpEntity<T> request(AmoCRMRequest amoCRMRequest, String url, Class<T> cl) throws APIAuthException {
         RestTemplate restTemplate = new RestTemplate();
+        restTemplate.setErrorHandler(this.errorHandler);
 
         HttpEntity<T> response;
 
-        if (amoCRMRequest.getHttpMethod().equals(HttpMethod.GET)) {
-            HttpEntity<MultiValueMap<String, String>> requestHttpEntity = plainHttpEntity();
+        try {
+            if (amoCRMRequest.getHttpMethod().equals(HttpMethod.GET)) {
+                HttpEntity<MultiValueMap<String, String>> requestHttpEntity = plainHttpEntity();
 
-            UriComponentsBuilder uriComponentsBuilder = this.uriComponentsBuilderByParams(
-                    amoCRMRequest, this.getApiBaseUrl().concat(url)
-            );
+                UriComponentsBuilder uriComponentsBuilder = this.uriComponentsBuilderByParams(
+                        amoCRMRequest, this.getApiBaseUrl().concat(url)
+                );
 
-            //System.out.println(uriComponentsBuilder.build().encode().toUriString());
+                response = restTemplate.exchange(
+                        uriComponentsBuilder.build().encode().toUri(),
+                        amoCRMRequest.getHttpMethod(), requestHttpEntity, cl
+                );
+            } else {
+                HttpEntity<AmoCRMRequest> requestHttpEntity = jsonHttpEntity(amoCRMRequest);
 
-            response = restTemplate.exchange(
-                    uriComponentsBuilder.build().encode().toUri(),
-                    amoCRMRequest.getHttpMethod(), requestHttpEntity, cl
-            );
-        } else {
-            HttpEntity<AmoCRMRequest> requestHttpEntity = jsonHttpEntity(amoCRMRequest);
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    System.out.println(objectMapper.writeValueAsString(requestHttpEntity.getBody()));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                    System.out.println("Cant present response as JSON object!");
+                }
 
-            ObjectMapper objectMapper = new ObjectMapper();
-            try {
-                System.out.println(objectMapper.writeValueAsString(requestHttpEntity.getBody()));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                System.out.println("Cant present response as JSON object!");
+                response = restTemplate.exchange(
+                        this.getApiBaseUrl().concat(url),
+                        amoCRMRequest.getHttpMethod(), requestHttpEntity, cl
+                );
             }
 
-            response = restTemplate.exchange(
-                    this.getApiBaseUrl().concat(url),
-                    amoCRMRequest.getHttpMethod(), requestHttpEntity, cl
-            );
-        }
+            this.relogins = 0;
 
-        return response;
+            return response;
+        } catch (APIRequestErrorException e) {
+            System.out.println("request to amocrm failed with error: " + e.getParams().toString());
+
+            if(e.getParams().get("code") != null && e.getParams().get("code").equals("401")){
+                if(this.relogins < this.maxRelogins) {
+                    this.logIn();
+                    this.relogins++;
+                    System.out.println("Login to AmoCRM!");
+                    return request(amoCRMRequest, url, cl);
+                }
+                else{
+                    System.out.println("Maximum relogins count (" + this.maxRelogins + ") reached for AmoCRM!");
+                    return null;
+                }
+            }
+            else return null;
+        }
     }
 
     @Override
@@ -420,5 +448,15 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     @Override
     public void setLeadClosedStatusesIDs(ArrayList<Long> leadClosedStatusesIDs) {
         this.leadClosedStatusesIDs = leadClosedStatusesIDs;
+    }
+
+    @Override
+    public void setErrorHandler(ResponseErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
+
+    @Override
+    public void setMaxRelogins(Integer maxRelogins) {
+        this.maxRelogins = maxRelogins;
     }
 }
