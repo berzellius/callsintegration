@@ -6,8 +6,10 @@ import com.callsintegration.dto.api.amocrm.auth.AmoCRMAuthResponse;
 import com.callsintegration.dto.api.amocrm.request.*;
 import com.callsintegration.dto.api.amocrm.response.*;
 import com.callsintegration.exception.APIAuthException;
+import com.callsintegration.settings.ProjectSettings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,6 +29,9 @@ import java.util.*;
  */
 @Service
 public class AmoCRMServiceImpl implements AmoCRMService {
+
+    @Autowired
+    ProjectSettings projectSettings;
 
     private String userLogin;
     private String userHash;
@@ -116,6 +121,10 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     @Override
     public AmoCRMCreatedContactsResponse editContacts(AmoCRMEntities amoCRMEntities) throws APIAuthException {
+        if(projectSettings.amoCRMReadOnlyMode()){
+            return null;
+        }
+
         AmoCRMContactPostRequest amoCRMContactPostRequest = new AmoCRMContactPostRequest();
         amoCRMContactPostRequest.setContacts(amoCRMEntities);
 
@@ -139,6 +148,10 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     @Override
     public AmoCRMCreatedNotesResponse addNoteToLead(AmoCRMNote amoCRMNote, AmoCRMLead amoCRMLead) throws APIAuthException {
+        if(projectSettings.amoCRMReadOnlyMode()){
+            return null;
+        }
+
         if (amoCRMLead.getId() == null) {
             throw new IllegalArgumentException("Передана не сохраненная в системе сделка!");
         }
@@ -291,6 +304,10 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     @Override
     public AmoCRMCreatedLeadsResponse editLeads(AmoCRMEntities amoCRMEntities) throws APIAuthException {
+        if(projectSettings.amoCRMReadOnlyMode()){
+            return null;
+        }
+
         AmoCRMLeadPostRequest amoCRMLeadPostRequest = new AmoCRMLeadPostRequest(amoCRMEntities);
         AmoCRMPostRequest amoCRMPostRequest = new AmoCRMPostRequest(amoCRMLeadPostRequest);
 

@@ -5,6 +5,10 @@ import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +35,8 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
     @Autowired
     AmoCRMService amoCRMService;
+
+    private static final Logger log = LoggerFactory.getLogger(IncomingCallBusinessProcessImpl.class);
 
     /*
      * Id пользователя по умолчанию, которому назначаются все сделки
@@ -63,7 +69,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
     @Override
     public void newIncomingCall(Call call){
-        System.out.println("call from " + call.getNumber());
+        log.info("Work with new call from number: " + call.getNumber());
 
         try {
             processCall(call);
@@ -80,13 +86,13 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         List<AmoCRMContact> amoCRMContacts = amoCRMService.getContactsByQuery(number);
 
         if(amoCRMContacts.size() == 0){
-            System.out.println("Not found contacts for this number");
+            log.info("Not found contacts for number " + number);
             createContact(call);
 
             processCall(call);
         }
         else{
-            System.out.println("Contacts found");
+            log.info("Contacts found for number " + number);
 
             AmoCRMContact contact = null;
             for(AmoCRMContact amoCRMContact : amoCRMContacts){
@@ -99,28 +105,23 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                             amoCRMCustomField.getId().equals(this.getPhoneNumberCustomField()) ||
                                     (amoCRMCustomField.getCode() != null && amoCRMCustomField.getCode().equals("PHONE"))
                             ) {
-                        System.out.println("Got custom field with phone number");
 
                         for (AmoCRMCustomFieldValue amoCRMCustomFieldValue : amoCRMCustomField.getValues()) {
                             if (amoCRMCustomFieldValue.getValue().equals(number)) {
-                                System.out.println("Custom field has correct number");
                                 contact = amoCRMContact;
                             }
                         }
                     }
-                    // TODO для доп. телефонов определять, что это - телефон по полю code. А поле enum можно вообще не парсить, нам без разницы
-
                 }
             }
 
             if(contact == null){
-                System.out.println("All found contacts is wrong");
+                log.info("All found contacts for number " + number + " is wrong");
                 createContact(call);
                 processCall(call);
             }
             else{
-                System.out.println("Got contact!");
-
+                log.info("Got contact #" + contact.getId().toString() + " for number " + number + "!");
                 this.workWithContact(contact, call);
             }
         }
@@ -130,21 +131,21 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         String number = call.getNumber();
         ArrayList<Long> leadIds = contact.getLinked_leads_id();
 
-        System.out.println("Work with contact");
+        log.info("Work with contact #" + contact.getId());
 
         AmoCRMLead amoCRMLeadFound = null;
         if(leadIds != null && leadIds.size() != 0){
-            System.out.println("Leads found. Checking statuses");
+            log.info("Leads found. Checking statuses");
             for(Long leadId : leadIds){
-                System.out.println("Lead #" + leadId);
+                log.info("Lead #" + leadId);
                 AmoCRMLead amoCRMLead = amoCRMService.getLeadById(leadId);
 
                 if(amoCRMLead != null){
                     if(amoCRMService.getLeadClosedStatusesIDs().contains(amoCRMLead.getStatus_id())){
-                        System.out.println("Lead is closed");
+                        log.info("Lead is closed");
                     }
                     else{
-                        System.out.println("Lead is open!");
+                        log.info("Lead is open!");
                         amoCRMLeadFound = amoCRMLead;
                     }
                 }
@@ -186,7 +187,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         }
 
         else{
-            System.out.println("We need to create lead for contact");
+            log.info("We need to create lead for contact #" + contact.getId());
             this.createLeadForContact(contact, call);
         }
     }
@@ -202,16 +203,16 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         amoCRMLead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), sourceField);
         String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
         amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
-        System.out.println("Creating lead for contact");
+        log.info("Creating lead for contact #" + contact.getId());
         AmoCRMCreatedEntityResponse amoCRMCreatedEntityResponse = amoCRMService.addLead(amoCRMLead);
 
         if(amoCRMCreatedEntityResponse == null){
             throw new IllegalStateException("No response, but we have not any error message from AmoCRM API!");
         }
 
-        System.out.println("Adding contact to lead");
-
-        amoCRMService.addContactToLead(contact, amoCRMService.getLeadById(amoCRMCreatedEntityResponse.getId()));
+        AmoCRMLead amoCRMLead1 = amoCRMService.getLeadById(amoCRMCreatedEntityResponse.getId());
+        log.info("Adding contact #" + contact.getId() + " to lead #" + amoCRMLead1.getId());
+        amoCRMService.addContactToLead(contact, amoCRMLead1);
     }
 
     private void createContact(Call call) throws APIAuthException {
