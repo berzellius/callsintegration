@@ -18,6 +18,14 @@ import java.util.List;
  */
 @Component
 public class CallTrackingCallsReader implements ItemReader<List<Call>> {
+
+    public static enum DateMode{
+        UPDATE_EACH_READ,
+        NO_UPDATE
+    }
+
+    private DateMode dateMode;
+
     @Autowired
     CallTrackingAPIService callTrackingAPIService;
 
@@ -34,15 +42,23 @@ public class CallTrackingCallsReader implements ItemReader<List<Call>> {
 
     public CallTrackingCallsReader(){}
 
-    public CallTrackingCallsReader(Date from, Date to, Integer maxResults){
+    public CallTrackingCallsReader(Date from, Date to, Integer maxResults, DateMode dm){
         this.setFrom(from);
         this.setTo(to);
         this.setMaxResults(maxResults);
+
+        if(dm == null){
+            dm = DateMode.UPDATE_EACH_READ;
+        }
+
+        this.setDateMode(dm);
     }
 
     @Override
     public List<Call> read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
-        //this.setStartIndex(callsService.callsAlreadyLoaded());
+        if(this.getDateMode() != null && this.getDateMode().equals(DateMode.UPDATE_EACH_READ)){
+            this.setDatesNow();
+        }
 
         List<Call> calls = callTrackingAPIService.getCalls(this.getFrom(), this.getTo(), this.getMaxResults() );
 
@@ -54,6 +70,13 @@ public class CallTrackingCallsReader implements ItemReader<List<Call>> {
         else {
             return null;
         }
+    }
+
+    private void setDatesNow() {
+        Date dt = new Date();
+        System.out.println("updated dates: " + dt);
+        this.setFrom(dt);
+        this.setTo(dt);
     }
 
     public Long getStartIndex() {
@@ -87,5 +110,13 @@ public class CallTrackingCallsReader implements ItemReader<List<Call>> {
 
     public void setTo(Date to) {
         this.to = to;
+    }
+
+    public DateMode getDateMode() {
+        return dateMode;
+    }
+
+    public void setDateMode(DateMode dateMode) {
+        this.dateMode = dateMode;
     }
 }

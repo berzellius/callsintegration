@@ -48,7 +48,7 @@ public class CallsImportBatchConfiguration {
     @Bean
     public ItemReader<List<Call>> callsReader() throws ParseException {
 
-        CallTrackingCallsReader reader = new CallTrackingCallsReader(new Date(), new Date(), 100);
+        CallTrackingCallsReader reader = new CallTrackingCallsReader(new Date(), new Date(), 100, CallTrackingCallsReader.DateMode.UPDATE_EACH_READ);
         return reader;
     }
 
