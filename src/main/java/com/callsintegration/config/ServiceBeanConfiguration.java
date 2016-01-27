@@ -73,9 +73,9 @@ public class ServiceBeanConfiguration {
     @Bean
     public ProjectSettings projectSettings(){
         // Локальный сервер
-        // return new LocalProjectSettings();
+        return new LocalProjectSettings();
         // Боевой сервер
-        return new RemoteProjectSettings();
+        //return new RemoteProjectSettings();
     }
 
     @Bean
@@ -154,6 +154,14 @@ public class ServiceBeanConfiguration {
         incomingCallBusinessProcess.setProjectIdToLeadsSource(projectIdToLeadsSource);
 
         return incomingCallBusinessProcess;
+    }
+
+    @Bean
+    public AddingCallNotesToEmptyLead addingCallNotesToEmptyLead(){
+        AddingCallNotesToEmptyLead addingCallNotesToEmptyLead = new AddingCallNotesToEmptyLeadImpl();
+        addingCallNotesToEmptyLead.setPhoneNumberCustomFieldLeads(561026l);
+
+        return addingCallNotesToEmptyLead;
     }
 
 }

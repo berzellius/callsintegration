@@ -9,6 +9,8 @@ import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.settings.ProjectSettings;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -264,6 +266,25 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     }
 
     @Override
+    public List<AmoCRMNote> getNotesByTypeAndElementId(String type, Long elementId) throws APIAuthException {
+        AmoCRMNotesGetRequest amoCRMNotesGetRequest = new AmoCRMNotesGetRequest();
+        amoCRMNotesGetRequest.setElement_id(elementId);
+        amoCRMNotesGetRequest.setType(type);
+
+        HttpEntity<AmoCRMNotesResponse> response = request(
+                amoCRMNotesGetRequest, "notes/list", AmoCRMNotesResponse.class
+        );
+
+        AmoCRMNotesResponse amoCRMNotesResponse = response.getBody();
+
+        if(amoCRMNotesResponse == null || amoCRMNotesResponse.getResponse() == null){
+            return new ArrayList<>();
+        }
+
+        return amoCRMNotesResponse.getResponse().getNotes();
+    }
+
+    @Override
     public AmoCRMLead getLeadById(Long leadId) throws APIAuthException {
         AmoCRMLeadsGetRequest amoCRMLeadsGetRequest = new AmoCRMLeadsGetRequest();
         amoCRMLeadsGetRequest.setId(leadId);
@@ -302,11 +323,21 @@ public class AmoCRMServiceImpl implements AmoCRMService {
         return amoCRMCreatedLeadsResponse.getResponse().getLeads().getAdd().get(0);
     }
 
+    private void updateLast_modified(AmoCRMEntities amoCRMEntities){
+        for(AmoCRMEntity amoCRMEntity : amoCRMEntities.getUpdate()){
+            // Увеличиваем last_modified, иначе изменения не будут учтены
+            amoCRMEntity.setLast_modified(amoCRMEntity.getLast_modified() + 1);
+        }
+    }
+
     @Override
     public AmoCRMCreatedLeadsResponse editLeads(AmoCRMEntities amoCRMEntities) throws APIAuthException {
+
         if(projectSettings.amoCRMReadOnlyMode()){
             return null;
         }
+
+        updateLast_modified(amoCRMEntities);
 
         AmoCRMLeadPostRequest amoCRMLeadPostRequest = new AmoCRMLeadPostRequest(amoCRMEntities);
         AmoCRMPostRequest amoCRMPostRequest = new AmoCRMPostRequest(amoCRMLeadPostRequest);
@@ -363,9 +394,11 @@ public class AmoCRMServiceImpl implements AmoCRMService {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.setErrorHandler(this.errorHandler);
 
+
         HttpEntity<T> response;
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
             if (amoCRMRequest.getHttpMethod().equals(HttpMethod.GET)) {
                 HttpEntity<MultiValueMap<String, String>> requestHttpEntity = plainHttpEntity();
 
@@ -380,7 +413,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
             } else {
                 HttpEntity<AmoCRMRequest> requestHttpEntity = jsonHttpEntity(amoCRMRequest);
 
-                ObjectMapper objectMapper = new ObjectMapper();
+
                 try {
                     System.out.println(objectMapper.writeValueAsString(requestHttpEntity.getBody()));
                 } catch (JsonProcessingException e) {
@@ -400,19 +433,20 @@ public class AmoCRMServiceImpl implements AmoCRMService {
         } catch (APIRequestErrorException e) {
             System.out.println("request to amocrm failed with error: " + e.getParams().toString());
 
-            if(e.getParams().get("code") != null && e.getParams().get("code").equals("401")){
-                if(this.relogins < this.maxRelogins) {
+            if (e.getParams().get("code") != null && e.getParams().get("code").equals("401")) {
+                if (this.relogins < this.maxRelogins) {
                     this.logIn();
                     this.relogins++;
                     System.out.println("Login to AmoCRM!");
                     return request(amoCRMRequest, url, cl);
-                }
-                else{
+                } else {
                     System.out.println("Maximum relogins count (" + this.maxRelogins + ") reached for AmoCRM!");
                     return null;
                 }
-            }
-            else return null;
+            } else return null;
+        } catch (RuntimeException e){
+            e.printStackTrace();
+            return null;
         }
     }
 

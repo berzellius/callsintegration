@@ -1,5 +1,6 @@
 package com.callsintegration.scheduling;
 
+import com.callsintegration.service.AddingCallNotesToEmptyLead;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -28,6 +29,9 @@ public class SchedulerImpl implements MainScheduler {
 
     @Autowired
     Job newCallsToCRMJob;
+
+    @Autowired
+    AddingCallNotesToEmptyLead addingCallNotesToEmptyLead;
 
     public void runCallsImport(){
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -58,8 +62,8 @@ public class SchedulerImpl implements MainScheduler {
     }
 
     /*
-     * 144 сек
-     */
+         * 144 сек
+         */
     @Scheduled(fixedDelay = 144000)
     @Override
     public void callsImportProcess(){
@@ -73,7 +77,7 @@ public class SchedulerImpl implements MainScheduler {
     /*
      * 1500 сек = 25 минут
      */
-    @Scheduled(fixedDelay = 1500000)
+    @Scheduled(fixedDelay = 3600000)
     @Override
     public void callsImportProcessMedium(){
         int hour = hourOfDay();
@@ -97,9 +101,21 @@ public class SchedulerImpl implements MainScheduler {
     }
 
 
-    @Scheduled(fixedDelay = 60000)
+    /*
+    *
+    * 3600 сек = 60 минут
+     */
+    @Scheduled(fixedDelay = 3600000)
     @Override
     public void callsToCRM(){
+        int hour = hourOfDay();
+
+        if(hour >= 22 || hour <= 8) {
+            runImportCallsToCRM();
+        }
+    }
+
+    private void runImportCallsToCRM(){
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addDate("start", new Date());
 

@@ -20,7 +20,7 @@ public class LocalProjectSettings extends CommonProjectSettings {
 
     @Override
     public boolean amoCRMReadOnlyMode() {
-        return true;
+        return false;
     }
 
 

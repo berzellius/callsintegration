@@ -1,6 +1,7 @@
 package com.callsintegration.dto.api.amocrm;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
@@ -15,6 +16,7 @@ import lombok.Data;
  *  Подробнее - https://developers.amocrm.ru/rest_api/notes_type.php#notecall
  */
 @JsonSerialize(using = AmoCRMNoteTextSerializer.class)
+@JsonDeserialize(using = AmoCRMNoteTextDeserializer.class)
 public class AmoCRMNoteText {
     public AmoCRMNoteText(){}
 

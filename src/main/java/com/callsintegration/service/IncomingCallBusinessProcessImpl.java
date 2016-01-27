@@ -3,6 +3,7 @@ package com.callsintegration.service;
 import com.callsintegration.dmodel.Call;
 import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
+import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedLeadsResponse;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,9 +27,6 @@ import java.util.Map;
 @Service
 @Transactional
 public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProcess {
-
-    @PersistenceContext
-    EntityManager entityManager;
 
     @Autowired
     CallRepository callRepository;
@@ -68,7 +66,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     private HashMap<Integer, Long> projectIdToLeadsSource;
 
     @Override
-    public void newIncomingCall(Call call){
+    public void newIncomingCall(Call call) {
         log.info("Work with new call from number: " + call.getNumber());
 
         try {
@@ -85,29 +83,37 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         String number = call.getNumber();
         List<AmoCRMContact> amoCRMContacts = amoCRMService.getContactsByQuery(number);
 
-        if(amoCRMContacts.size() == 0){
+        if (amoCRMContacts.size() == 0) {
             log.info("Not found contacts for number " + number);
-            createContact(call);
 
-            processCall(call);
-        }
-        else{
+            /**
+             * Удалено 02.12.2015 - теперь создавать отсутствующий контакт не надо.
+             * Создание контактов осуществляет сторонний сервис
+             */
+            /*createContact(call);
+            processCall(call);*/
+        } else {
             log.info("Contacts found for number " + number);
 
             AmoCRMContact contact = null;
-            for(AmoCRMContact amoCRMContact : amoCRMContacts){
-                if(amoCRMContact.getCustom_fields() == null)
+            for (AmoCRMContact amoCRMContact : amoCRMContacts) {
+                if (amoCRMContact.getCustom_fields() == null)
                     continue;
                 ArrayList<AmoCRMCustomField> crmCustomFields = amoCRMContact.getCustom_fields();
 
-                for(AmoCRMCustomField amoCRMCustomField : crmCustomFields){
-                    if(
+                for (AmoCRMCustomField amoCRMCustomField : crmCustomFields) {
+                    if (
                             amoCRMCustomField.getId().equals(this.getPhoneNumberCustomField()) ||
                                     (amoCRMCustomField.getCode() != null && amoCRMCustomField.getCode().equals("PHONE"))
                             ) {
 
                         for (AmoCRMCustomFieldValue amoCRMCustomFieldValue : amoCRMCustomField.getValues()) {
-                            if (amoCRMCustomFieldValue.getValue().equals(number)) {
+                            String value = amoCRMCustomFieldValue.getValue();
+                            if(value.length() == 11){
+                                value = value.substring(1);
+                            }
+
+                            if (value.equals(number)) {
                                 contact = amoCRMContact;
                             }
                         }
@@ -115,12 +121,9 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                 }
             }
 
-            if(contact == null){
+            if (contact == null) {
                 log.info("All found contacts for number " + number + " is wrong");
-                createContact(call);
-                processCall(call);
-            }
-            else{
+            } else {
                 log.info("Got contact #" + contact.getId().toString() + " for number " + number + "!");
                 this.workWithContact(contact, call);
             }
@@ -133,66 +136,139 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
         log.info("Work with contact #" + contact.getId());
 
-        AmoCRMLead amoCRMLeadFound = null;
-        if(leadIds != null && leadIds.size() != 0){
+        Integer foundOpenedLeads = 0;
+        if (leadIds != null && leadIds.size() != 0) {
             log.info("Leads found. Checking statuses");
-            for(Long leadId : leadIds){
+            for (Long leadId : leadIds) {
                 log.info("Lead #" + leadId);
                 AmoCRMLead amoCRMLead = amoCRMService.getLeadById(leadId);
 
-                if(amoCRMLead != null){
-                    if(amoCRMService.getLeadClosedStatusesIDs().contains(amoCRMLead.getStatus_id())){
+                if (amoCRMLead != null) {
+                    if (amoCRMService.getLeadClosedStatusesIDs().contains(amoCRMLead.getStatus_id())) {
                         log.info("Lead is closed");
-                    }
-                    else{
+                    } else {
                         log.info("Lead is open!");
-                        amoCRMLeadFound = amoCRMLead;
+                        //amoCRMLeadToWorkWith = amoCRMLead;
+                        foundOpenedLeads++;
+                        checkExistingLeadCustomFields(amoCRMLead, call);
                     }
                 }
             }
         }
 
-        if(amoCRMLeadFound != null){
-
-            // Добавляем звонок
-            AmoCRMNote amoCRMNote = new AmoCRMNote();
-            // 10 - звонок
-            amoCRMNote.setNote_type(10);
-            AmoCRMNoteText amoCRMNoteText = new AmoCRMNoteText();
-            amoCRMNoteText.setPhone(number);
-            amoCRMNoteText.setUniq(call.getId().toString());
-            Map<String, String> params = call.getParams();
-            //String number = call.getNumber();
-            String duration = (params != null && params.get("ct:duration") != null)? params.get("ct:duration") : "1";
-            amoCRMNoteText.setDuration(duration);
-            String status = "4";
-            if(call.getStatus() != null){
-                switch (call.getStatus()){
-                    case ANSWERED:
-                        status = "4";
-                        break;
-                    case NO_ANSWER:
-                        status = "2";
-                        break;
-                    case BUSY:
-                        status = "6";
-                }
-                amoCRMNoteText.setCall_result(call.getStatus().getStr());
-            }
-            amoCRMNoteText.setCall_status(status);
-            amoCRMNoteText.setSrc("CallTracking");
-            amoCRMNote.setText(amoCRMNoteText);
-
-            amoCRMService.addNoteToLead(amoCRMNote, amoCRMLeadFound);
+        // Не найдено сделок
+        if (foundOpenedLeads == 0) {
+            log.info("We need to create lead for contact #" + contact.getId());
+            AmoCRMLead amoCRMLeadToWorkWith = this.createLeadForContact(contact, call);
         }
 
-        else{
-            log.info("We need to create lead for contact #" + contact.getId());
-            this.createLeadForContact(contact, call);
+
+        /*
+        *
+        * Добавлять событие "звонок" больше не нужно.
+        * 21.01.2016
+         */
+        /*
+        // Добавляем звонок
+        AmoCRMNote amoCRMNote = new AmoCRMNote();
+        // 10 - звонок
+        amoCRMNote.setNote_type(10);
+        AmoCRMNoteText amoCRMNoteText = new AmoCRMNoteText();
+        amoCRMNoteText.setPhone(number);
+        amoCRMNoteText.setUniq(call.getId().toString());
+        Map<String, String> params = call.getParams();
+        //String number = call.getNumber();
+        String duration = (params != null && params.get("ct:duration") != null) ? params.get("ct:duration") : "1";
+        amoCRMNoteText.setDuration(duration);
+        String status = "4";
+        if (call.getStatus() != null) {
+            switch (call.getStatus()) {
+                case ANSWERED:
+                    status = "4";
+                    break;
+                case NO_ANSWER:
+                    status = "2";
+                    break;
+                case BUSY:
+                    status = "6";
+            }
+            amoCRMNoteText.setCall_result(call.getStatus().getStr());
+        }
+        amoCRMNoteText.setCall_status(status);
+        amoCRMNoteText.setSrc("CallTracking");
+        amoCRMNote.setText(amoCRMNoteText);
+
+        amoCRMService.addNoteToLead(amoCRMNote, amoCRMLeadToWorkWith);
+        */
+    }
+
+    private void checkExistingLeadCustomFields(AmoCRMLead amoCRMLead, Call call) throws APIAuthException {
+
+        log.info("checking custom fields for lead #".concat(amoCRMLead.getId().toString()));
+        ArrayList<AmoCRMCustomField> amoCRMCustomFields = amoCRMLead.getCustom_fields();
+
+        Boolean updated = false;
+
+        if(amoCRMCustomFields == null){
+            amoCRMCustomFields = new ArrayList<AmoCRMCustomField>();
+        }
+
+        AmoCRMCustomField marketingChannelCustomField = null;
+        AmoCRMCustomField sourceCustomField = null;
+
+        for(AmoCRMCustomField amoCRMCustomField : amoCRMCustomFields){
+
+            if(amoCRMCustomField.getId().equals(this.getMarketingChannelLeadsCustomField())){
+                // Кастомное поле "Рекламный канал"
+                marketingChannelCustomField = amoCRMCustomField;
+            }
+
+            if(amoCRMCustomField.getId().equals(this.getSourceLeadsCustomField())){
+                // Кастомное поле "Источник"
+                sourceCustomField = amoCRMCustomField;
+            }
+        }
+
+        if(
+                marketingChannelCustomField == null ||
+                        marketingChannelCustomField.getValues() == null ||
+                        marketingChannelCustomField.getValues().size() == 0
+                ){
+            log.info("'Marketing Channel' is absent or empty");
+            updated = true;
+            String[] sourceField = {call.getSource()};
+            amoCRMLead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), sourceField);
+        }
+
+        if(
+                sourceCustomField == null ||
+                        sourceCustomField.getValues() == null ||
+                        sourceCustomField.getValues().size() == 0
+                ){
+            log.info("'Source' is absent or empty");
+            updated = true;
+            String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
+            amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
+        }
+
+
+        if(updated){
+            log.info("Lead #".concat(amoCRMLead.getId().toString()).concat(" has been updated"));
+
+            AmoCRMEntities amoCRMEntities = new AmoCRMEntities();
+            ArrayList<AmoCRMLead> amoCRMLeads = new ArrayList<>();
+            amoCRMLeads.add(amoCRMLead);
+            amoCRMEntities.setUpdate(amoCRMLeads);
+            AmoCRMCreatedLeadsResponse response = amoCRMService.editLeads(amoCRMEntities);
+            if (response == null) {
+                throw new IllegalStateException("No response, but we have not any error message from AmoCRM API!");
+            }
+
+            log.info(response.getResponse().toString());
         }
     }
 
-    private void createLeadForContact(AmoCRMContact contact, Call call) throws APIAuthException {
+    private AmoCRMLead createLeadForContact(AmoCRMContact contact, Call call) throws APIAuthException {
         String number = call.getNumber();
         AmoCRMLead amoCRMLead = new AmoCRMLead();
         amoCRMLead.setName("Автоматически -> " + contact.getName());
@@ -206,13 +282,16 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         log.info("Creating lead for contact #" + contact.getId());
         AmoCRMCreatedEntityResponse amoCRMCreatedEntityResponse = amoCRMService.addLead(amoCRMLead);
 
-        if(amoCRMCreatedEntityResponse == null){
+        if (amoCRMCreatedEntityResponse == null) {
             throw new IllegalStateException("No response, but we have not any error message from AmoCRM API!");
         }
 
+        // Обновляем данные
         AmoCRMLead amoCRMLead1 = amoCRMService.getLeadById(amoCRMCreatedEntityResponse.getId());
         log.info("Adding contact #" + contact.getId() + " to lead #" + amoCRMLead1.getId());
         amoCRMService.addContactToLead(contact, amoCRMLead1);
+
+        return amoCRMLead1;
     }
 
     private void createContact(Call call) throws APIAuthException {
