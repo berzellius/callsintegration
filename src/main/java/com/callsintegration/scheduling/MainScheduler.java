@@ -21,4 +21,7 @@ public interface MainScheduler {
 
     @Scheduled(fixedDelay = 30000)
     void callsToCRM();
+
+    @Scheduled(fixedDelay = 60000)
+    void newLeads();
 }

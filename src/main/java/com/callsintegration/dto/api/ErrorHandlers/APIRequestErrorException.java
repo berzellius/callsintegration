@@ -26,4 +26,9 @@ public class APIRequestErrorException extends RuntimeException {
     public void setParams(Map<String, Object> params) {
         this.params = params;
     }
+
+    @Override
+    public String toString(){
+        return this.getParams().toString();
+    }
 }

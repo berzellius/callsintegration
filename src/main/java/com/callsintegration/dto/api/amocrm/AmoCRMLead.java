@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AmoCRMLead extends AmoCRMEntityWCustomFields {
+public class AmoCRMLead extends AmoCRMEntityWCustomFieldsAndTags {
     public AmoCRMLead(){}
 
     private Long id;

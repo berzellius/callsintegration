@@ -1,13 +1,16 @@
 package com.callsintegration.web;
 
 import com.callsintegration.dmodel.Call;
+import com.callsintegration.dmodel.CallTrackingSourceCondition;
 import com.callsintegration.dto.api.amocrm.AmoCRMContact;
 import com.callsintegration.dto.api.amocrm.AmoCRMContactsLeadsLink;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMContactsResponse;
+import com.callsintegration.dto.api.calltracking.CallTrackingWebsiteSources;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.AmoCRMService;
 import com.callsintegration.service.CallTrackingAPIService;
+import com.callsintegration.service.CallTrackingSourceConditionService;
 import com.callsintegration.service.IncomingCallBusinessProcess;
 import com.callsintegration.specifications.CallSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,9 @@ public class IndexController extends BaseController {
 
     @Autowired
     CallRepository callRepository;
+
+    @Autowired
+    CallTrackingSourceConditionService callTrackingSourceConditionService;
 
     @Autowired
     AmoCRMService amoCRMService;
@@ -75,6 +81,9 @@ public class IndexController extends BaseController {
                     incomingCallBusinessProcess.newIncomingCall(call);
                 }
             }*/
+            Iterable<CallTrackingSourceCondition> callTrackingSourceConditions = callTrackingSourceConditionService.getAllSources();
+
+            model.addAttribute("rows", callTrackingSourceConditions);
 
 
         return "index";

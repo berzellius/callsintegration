@@ -1,6 +1,8 @@
 package com.callsintegration.service;
 
 import com.callsintegration.dmodel.Call;
+import com.callsintegration.dmodel.CallTrackingSourceCondition;
+import com.callsintegration.dto.api.calltracking.CallTrackingWebsiteSources;
 import com.callsintegration.exception.APIAuthException;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,14 @@ import java.util.List;
 @Service
 public interface CallTrackingAPIService {
     void setProjects(Integer[] projects);
+
+    /*
+    *
+    * Обновить данные по рекламным каналам
+     */
+    void updateMarketingChannelsFromCalltracking() throws APIAuthException;
+
+    List<CallTrackingSourceCondition> getAllMarketingChannelsFromCalltracking() throws APIAuthException;
 
     List<Call> getCalls(Date from, Date to, Integer maxResults) throws APIAuthException;
 
@@ -45,4 +55,20 @@ public interface CallTrackingAPIService {
     void setApiMethod(HttpMethod apiMethod);
 
     void setErrorHandler(ResponseErrorHandler errorHandler);
+
+    String getWebSiteLogin();
+
+    void setWebSiteLogin(String webSiteLogin);
+
+    String getWebSitePassword();
+
+    void setWebSitePassword(String webSitePassword);
+
+    String getWebSiteLoginUrl();
+
+    void setWebSiteLoginUrl(String webSiteLoginUrl);
+
+    String getWebSiteLoginMethod();
+
+    void setWebSiteLoginMethod(String webSiteLoginMethod);
 }

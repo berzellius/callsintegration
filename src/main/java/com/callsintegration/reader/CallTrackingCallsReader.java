@@ -60,6 +60,10 @@ public class CallTrackingCallsReader implements ItemReader<List<Call>> {
             this.setDatesNow();
         }
 
+        /*
+        * getCalls загружает звонки, которые еще не сохранены в БД
+        * повторный вызов без сохранения звонков в базе возвратит повторяющийся блок данных.
+         */
         List<Call> calls = callTrackingAPIService.getCalls(this.getFrom(), this.getTo(), this.getMaxResults() );
 
         System.out.println("read calls: " + calls);

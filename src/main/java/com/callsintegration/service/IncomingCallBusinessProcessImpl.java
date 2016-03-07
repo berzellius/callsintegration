@@ -109,7 +109,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
                         for (AmoCRMCustomFieldValue amoCRMCustomFieldValue : amoCRMCustomField.getValues()) {
                             String value = amoCRMCustomFieldValue.getValue();
-                            if(value.length() == 11){
+                            if (value.length() == 11) {
                                 value = value.substring(1);
                             }
 
@@ -209,42 +209,42 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
         Boolean updated = false;
 
-        if(amoCRMCustomFields == null){
+        if (amoCRMCustomFields == null) {
             amoCRMCustomFields = new ArrayList<AmoCRMCustomField>();
         }
 
         AmoCRMCustomField marketingChannelCustomField = null;
         AmoCRMCustomField sourceCustomField = null;
 
-        for(AmoCRMCustomField amoCRMCustomField : amoCRMCustomFields){
+        for (AmoCRMCustomField amoCRMCustomField : amoCRMCustomFields) {
 
-            if(amoCRMCustomField.getId().equals(this.getMarketingChannelLeadsCustomField())){
+            if (amoCRMCustomField.getId().equals(this.getMarketingChannelLeadsCustomField())) {
                 // Кастомное поле "Рекламный канал"
                 marketingChannelCustomField = amoCRMCustomField;
             }
 
-            if(amoCRMCustomField.getId().equals(this.getSourceLeadsCustomField())){
+            if (amoCRMCustomField.getId().equals(this.getSourceLeadsCustomField())) {
                 // Кастомное поле "Источник"
                 sourceCustomField = amoCRMCustomField;
             }
         }
 
-        if(
+        if (
                 marketingChannelCustomField == null ||
                         marketingChannelCustomField.getValues() == null ||
                         marketingChannelCustomField.getValues().size() == 0
-                ){
+                ) {
             log.info("'Marketing Channel' is absent or empty");
             updated = true;
             String[] sourceField = {call.getSource()};
             amoCRMLead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), sourceField);
         }
 
-        if(
+        if (
                 sourceCustomField == null ||
                         sourceCustomField.getValues() == null ||
                         sourceCustomField.getValues().size() == 0
-                ){
+                ) {
             log.info("'Source' is absent or empty");
             updated = true;
             String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
@@ -252,7 +252,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         }
 
 
-        if(updated){
+        if (updated) {
             log.info("Lead #".concat(amoCRMLead.getId().toString()).concat(" has been updated"));
 
             AmoCRMEntities amoCRMEntities = new AmoCRMEntities();
@@ -280,7 +280,9 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
         amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
         log.info("Creating lead for contact #" + contact.getId());
+
         AmoCRMCreatedEntityResponse amoCRMCreatedEntityResponse = amoCRMService.addLead(amoCRMLead);
+
 
         if (amoCRMCreatedEntityResponse == null) {
             throw new IllegalStateException("No response, but we have not any error message from AmoCRM API!");

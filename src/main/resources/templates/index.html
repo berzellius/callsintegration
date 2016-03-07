@@ -10,15 +10,28 @@
     <p><a href="http://www.amocrm.ru/">AmoCRM.ru</a></p>
 
 
-    <table>
-        <!--@thymesVar id="calls" type="com.callsintegration.dmodel.Call"-->
-        <!--tr th:each="call : ${calls}">
-            <td th:text="${call.number}" />
-            <td th:text="${call.dt}" />
-            <td th:text="${call.source}" />
-            <td th:text="${call.status}" />
-            <td th:text="${call.params}" />
-        </tr-->
+    <table border="1">
+        <!--@thymesVar id="rows" type="com.callsintegration.calltracking.CallTrackingWebsiteSource"-->
+        <tr>
+            <th>id</th>
+            <th>Название РК</th>
+            <th>utm_source</th>
+            <th>utm_medium</th>
+            <th>utm_campaign</th>
+            <th>project_id</th>
+            <th>truth</th>
+            <th>phones_count</th>
+        </tr>
+        <tr th:each="row : ${rows}">
+            <td th:text="${row.id}" />
+            <td th:text="${row.sourceName}" />
+            <td th:text="${row.utmSource}" />
+            <td th:text="${row.utmMedium}" />
+            <td th:text="${row.utmCampaign}" />
+            <td th:text="${row.projectId}" />
+            <td th:text="${row.truth}" />
+            <td th:text="${row.phonesCount}" />
+        </tr>
      </table>
 </body>
 </html>

@@ -6,13 +6,17 @@ import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.CallsService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -48,6 +52,7 @@ public class CallsImportBatchConfiguration {
     @Bean
     public ItemReader<List<Call>> callsReader() throws ParseException {
 
+        // Внимание: один шаг чтения должен сопровождаться одним шагом записи в БД. иначе будут засасываться повторяющиеся данные.
         CallTrackingCallsReader reader = new CallTrackingCallsReader(new Date(), new Date(), 100, CallTrackingCallsReader.DateMode.UPDATE_EACH_READ);
         return reader;
     }
@@ -90,7 +95,8 @@ public class CallsImportBatchConfiguration {
             ItemProcessor<List<Call>, List<Call>> itemProcessor,
             ItemWriter<List<Call>> writer
     ){
-        return stepBuilderFactory.get("callsImportStep")
+       return stepBuilderFactory.get("callsImportStep")
+               // представляется верным, что chunk size - это эквивалент commit interval
                 .<List<Call>, List<Call>>chunk(1)
                 .reader(callsReader)
                 .processor(itemProcessor)

@@ -247,6 +247,7 @@ public class AmoCRMServiceImpl implements AmoCRMService {
 
     @Override
     public List<AmoCRMLead> getLeadsByQuery(String query, Long limit, Long offset) throws APIAuthException {
+        System.out.println("query = " + query + "; limit/offset = " + limit + "/" + offset);
         AmoCRMLeadsGetRequest amoCRMLeadsGetRequest = new AmoCRMLeadsGetRequest();
         amoCRMLeadsGetRequest.setQuery(query);
         amoCRMLeadsGetRequest.setLimit_rows(limit);
@@ -324,6 +325,10 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     }
 
     private void updateLast_modified(AmoCRMEntities amoCRMEntities){
+        if(amoCRMEntities.getUpdate() == null){
+            return;
+        }
+
         for(AmoCRMEntity amoCRMEntity : amoCRMEntities.getUpdate()){
             // Увеличиваем last_modified, иначе изменения не будут учтены
             amoCRMEntity.setLast_modified(amoCRMEntity.getLast_modified() + 1);
