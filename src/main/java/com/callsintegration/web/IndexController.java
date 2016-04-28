@@ -49,7 +49,9 @@ public class IndexController extends BaseController {
 
     @RequestMapping
     public String indexPage(
-            Model model
+            Model model,
+            String code,
+            String domain
     ) throws ParseException {
 
 
@@ -81,10 +83,11 @@ public class IndexController extends BaseController {
                     incomingCallBusinessProcess.newIncomingCall(call);
                 }
             }*/
-            Iterable<CallTrackingSourceCondition> callTrackingSourceConditions = callTrackingSourceConditionService.getAllSources();
+            //Iterable<CallTrackingSourceCondition> callTrackingSourceConditions = callTrackingSourceConditionService.getAllSources();
 
-            model.addAttribute("rows", callTrackingSourceConditions);
-
+           // model.addAttribute("rows", callTrackingSourceConditions);
+            model.addAttribute("code", code);
+            model.addAttribute("domain", domain);
 
         return "index";
     }

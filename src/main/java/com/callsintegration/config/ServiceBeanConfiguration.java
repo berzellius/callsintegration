@@ -36,6 +36,8 @@ public class ServiceBeanConfiguration {
         HashMap<Integer, Long> projectIdToLeadsSource = new HashMap<>();
         projectIdToLeadsSource.put(3901, 1324014l);
         projectIdToLeadsSource.put(3400, 1324016l);
+        projectIdToLeadsSource.put(4318, 1337536l);
+        projectIdToLeadsSource.put(4319, 1335876l);
 
         return projectIdToLeadsSource;
     }
@@ -110,7 +112,7 @@ public class ServiceBeanConfiguration {
         callTrackingAPIService.setWebSiteLogin("info@home-motion.ru");
         callTrackingAPIService.setWebSitePassword("SsX0d1XE75");
         callTrackingAPIService.setWebSiteLoginUrl("https://calltracking.ru/admin/login");
-        Integer[] projects = {3901, 3400};
+        Integer[] projects = {3901, 3400, 4318, 4319};
         callTrackingAPIService.setProjects(projects);
 
         CalltrackingAPIRequestErrorHandler errorHandler = new CalltrackingAPIRequestErrorHandler();
@@ -160,6 +162,8 @@ public class ServiceBeanConfiguration {
         HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
         projectIdToContactsSource.put(3901, 1324018l);
         projectIdToContactsSource.put(3400, 1324020l);
+        projectIdToContactsSource.put(4318, 1338944l);
+        projectIdToContactsSource.put(4319, 1335878l);
 
         HashMap<Integer, Long> projectIdToLeadsSource = projectIdToLeadsSource();
 

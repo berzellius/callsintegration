@@ -10,9 +10,9 @@
     <p><a href="http://www.amocrm.ru/">AmoCRM.ru</a></p>
 
 
-    <table border="1">
+    <!--table border="1"-->
         <!--@thymesVar id="rows" type="com.callsintegration.calltracking.CallTrackingWebsiteSource"-->
-        <tr>
+        <!--tr>
             <th>id</th>
             <th>Название РК</th>
             <th>utm_source</th>
@@ -32,6 +32,8 @@
             <td th:text="${row.truth}" />
             <td th:text="${row.phonesCount}" />
         </tr>
-     </table>
+     </table-->
+    <h1>Code: <span th:text="${code}" /></h1>
+    <h1>Domain: <span th:text="${domain}" /></h1>
 </body>
 </html>
