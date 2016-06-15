@@ -1,6 +1,12 @@
 package com.callsintegration.service;
 
+import com.callsintegration.dmodel.LeadFromSite;
+import com.callsintegration.dmodel.Site;
+import com.callsintegration.dto.site.Lead;
+import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
+import com.callsintegration.repository.LeadFromSiteRepository;
+import com.callsintegration.repository.SiteRepository;
 import com.callsintegration.specifications.CallSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
@@ -10,7 +16,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by berz on 27.09.2015.
@@ -23,6 +31,12 @@ public class CallsServiceImpl implements CallsService {
 
     @Autowired
     CallRepository callRepository;
+
+    @Autowired
+    SiteRepository siteRepository;
+
+    @Autowired
+    LeadFromSiteRepository leadFromSiteRepository;
 
     @Override
     public Long callsAlreadyLoaded() {
@@ -41,5 +55,29 @@ public class CallsServiceImpl implements CallsService {
                         .and(CallSpecifications.byProjectId(project))
         );
         return count;
+    }
+
+    @Override
+    public Result newLeadFromSite(List<Lead> leads, String url, String password) {
+        List<Site> sites = siteRepository.findByUrlAndPassword(url, password);
+        if(sites.size() == 0){
+            return new Result("error");
+        }
+
+        Site site = sites.get(0);
+
+        List<LeadFromSite> leadFromSiteList = new ArrayList<>();
+        for(Lead lead : leads){
+            LeadFromSite leadFromSite = new LeadFromSite();
+            leadFromSite.setDtmCreate(new Date());
+            leadFromSite.setSite(site);
+            leadFromSite.setLead(lead);
+            leadFromSite.setState(LeadFromSite.State.NEW);
+
+            leadFromSiteList.add(leadFromSite);
+        }
+
+        leadFromSiteRepository.save(leadFromSiteList);
+        return new Result("success");
     }
 }
