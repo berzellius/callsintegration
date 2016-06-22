@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * Created by berz on 20.09.2015.
  */
-@Component
+/*@Component*/
 public class SchedulerImpl implements MainScheduler {
 
     @Autowired
@@ -36,10 +36,36 @@ public class SchedulerImpl implements MainScheduler {
     Job leadsFromSiteJob;
 
     @Autowired
+    Job newLeadsFromSiteToCRMJob;
+
+    @Autowired
     AddingCallNotesToEmptyLead addingCallNotesToEmptyLead;
 
     @Autowired
     CallTrackingAPIService callTrackingAPIService;
+
+
+    @Scheduled(fixedDelay = 120000)
+    @Override
+    public void newLeadsFromSiteToCRM(){
+        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
+        jobParametersBuilder.addDate("start", new Date());
+
+
+        try {
+            jobLauncher.run(newLeadsFromSiteToCRMJob, jobParametersBuilder.toJobParameters());
+        } catch (JobExecutionAlreadyRunningException e) {
+            e.printStackTrace();
+        } catch (JobRestartException e) {
+            e.printStackTrace();
+        } catch (JobInstanceAlreadyCompleteException e) {
+            e.printStackTrace();
+        } catch (JobParametersInvalidException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public void runCallsImport(){
 
@@ -124,9 +150,11 @@ public class SchedulerImpl implements MainScheduler {
         }
     }
 
+
     @Scheduled(fixedDelay = 600000)
     @Override
     public void newLeads(){
+
         int hour = hourOfDay();
 
         if((hour >= 3 && hour <= 4) || (hour >= 22 && hour <= 23))
@@ -156,6 +184,8 @@ public class SchedulerImpl implements MainScheduler {
     }
 
     private void runImportCallsToCRM(){
+
+
         try {
 
             JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();

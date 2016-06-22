@@ -24,6 +24,13 @@ public class Site extends DModelEntity {
     private String url;
     private String password;
 
+    @Column(name = "crm_contact_source_id")
+    private String crmContactSourceId;
+    @Column(name = "crm_lead_source_id")
+    private String crmLeadSourceId;
+    @Column(name = "calltracking_project_id")
+    private Integer callTrackingProjectId;
+
     public String getUrl() {
         return url;
     }
@@ -58,5 +65,29 @@ public class Site extends DModelEntity {
     @Override
     public String toString() {
         return "site#".concat(this.getId().toString());
+    }
+
+    public String getCrmContactSourceId() {
+        return crmContactSourceId;
+    }
+
+    public void setCrmContactSourceId(String crmContactSourceId) {
+        this.crmContactSourceId = crmContactSourceId;
+    }
+
+    public String getCrmLeadSourceId() {
+        return crmLeadSourceId;
+    }
+
+    public void setCrmLeadSourceId(String crmLeadSourceId) {
+        this.crmLeadSourceId = crmLeadSourceId;
+    }
+
+    public Integer getCallTrackingProjectId() {
+        return callTrackingProjectId;
+    }
+
+    public void setCallTrackingProjectId(Integer callTrackingProjectId) {
+        this.callTrackingProjectId = callTrackingProjectId;
     }
 }

@@ -1,6 +1,8 @@
 package com.callsintegration.service;
 
+import com.callsintegration.dmodel.LeadFromSite;
 import com.callsintegration.dto.api.amocrm.AmoCRMLead;
+import com.callsintegration.exception.APIAuthException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -27,4 +29,6 @@ public interface AmoCRMLeadsFromSiteService {
     void setNewLeadFromSiteStatusCustomFieldId(Long newLeadFromSiteStatusCustomFieldId);
 
     void setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(Long newLeadFromSiteStatusCustomFieldEnumNotProcessed);
+
+    LeadFromSite processLeadFromSite(LeadFromSite leadFromSite) throws APIAuthException;
 }

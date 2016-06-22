@@ -87,9 +87,9 @@ public class ServiceBeanConfiguration {
     @Bean
     public ProjectSettings projectSettings(){
         // Локальный сервер
-        //return new LocalProjectSettings();
+        return new LocalProjectSettings();
         // Боевой сервер
-        return new RemoteProjectSettings();
+        //return new RemoteProjectSettings();
     }
 
     @Bean
@@ -157,6 +157,8 @@ public class ServiceBeanConfiguration {
         incomingCallBusinessProcess.setMarketingChannelContactsCustomField(561442l);
         incomingCallBusinessProcess.setMarketingChannelLeadsCustomField(561440l);
         incomingCallBusinessProcess.setSourceContactsCustomField(561446l);
+        incomingCallBusinessProcess.setEmailContactCustomField(459344l);
+        incomingCallBusinessProcess.setEmailContactEnum("1084672");
         incomingCallBusinessProcess.setSourceLeadsCustomField(sourceLeadsCustomField());
 
         HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();

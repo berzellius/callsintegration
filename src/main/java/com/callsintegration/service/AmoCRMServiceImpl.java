@@ -286,6 +286,26 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     }
 
     @Override
+    public AmoCRMContact getContactById(Long contactId) throws APIAuthException {
+        AmoCRMContactsGetRequest amoCRMContactsGetRequest = new AmoCRMContactsGetRequest();
+        amoCRMContactsGetRequest.setId(contactId);
+        amoCRMContactsGetRequest.setLimit_rows(1l);
+        amoCRMContactsGetRequest.setLimit_offset(0l);
+
+        HttpEntity<AmoCRMContactsResponse> response = request(
+                amoCRMContactsGetRequest, "contacts/list", AmoCRMContactsResponse.class
+        );
+
+        AmoCRMContactsResponse amoCRMContactsResponse = response.getBody();
+
+        if (amoCRMContactsResponse == null || amoCRMContactsResponse.getResponse() == null) {
+            return null;
+        }
+
+        return amoCRMContactsResponse.getResponse().getContacts().get(0);
+    }
+
+    @Override
     public AmoCRMLead getLeadById(Long leadId) throws APIAuthException {
         AmoCRMLeadsGetRequest amoCRMLeadsGetRequest = new AmoCRMLeadsGetRequest();
         amoCRMLeadsGetRequest.setId(leadId);

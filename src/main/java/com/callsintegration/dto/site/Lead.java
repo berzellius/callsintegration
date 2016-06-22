@@ -1,8 +1,11 @@
 package com.callsintegration.dto.site;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * Created by berz on 15.06.2016.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Lead {
 
     public Lead() {

@@ -9,4 +9,24 @@ import org.springframework.stereotype.Service;
 @Service
 public interface IncomingCallBusinessProcess {
     void newIncomingCall(Call call);
+
+    Long getPhoneNumberCustomField();
+
+    Long getDefaultUserId();
+
+    Long getPhoneNumberCustomFieldLeads();
+
+    Long getMarketingChannelContactsCustomField();
+
+    Long getMarketingChannelLeadsCustomField();
+
+    Long getSourceContactsCustomField();
+
+    Long getSourceLeadsCustomField();
+
+    Long getEmailContactCustomField();
+
+    String getEmailContactEnum();
+
+    void setEmailContactEnum(String emailContactEnum);
 }

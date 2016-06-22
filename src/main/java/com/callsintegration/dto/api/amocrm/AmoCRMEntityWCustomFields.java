@@ -15,9 +15,17 @@ public class AmoCRMEntityWCustomFields extends AmoCRMEntity {
     public AmoCRMEntityWCustomFields(){}
 
     public void addStringValuesToCustomField(Long id, String[] values){
+        addStringValuesToCustomField(id, values, null);
+    }
+
+    public void addStringValuesToCustomField(Long id, String[] values, String enumVal){
         ArrayList<AmoCRMCustomFieldValue> fieldValues = new ArrayList<>();
         for(String value : values){
             AmoCRMCustomFieldValue amoCRMCustomFieldValue = new AmoCRMCustomFieldValue(value);
+
+            if(enumVal != null){
+                amoCRMCustomFieldValue.setEnumerated(enumVal);
+            }
             fieldValues.add(amoCRMCustomFieldValue);
         }
 
@@ -35,6 +43,10 @@ public class AmoCRMEntityWCustomFields extends AmoCRMEntity {
 
                     for(String value : values){
                         AmoCRMCustomFieldValue customFieldValue = new AmoCRMCustomFieldValue(value);
+
+                        if(enumVal != null){
+                            customFieldValue.setEnumerated(enumVal);
+                        }
                         crmCustomFieldValues.add(customFieldValue);
                     }
                 }

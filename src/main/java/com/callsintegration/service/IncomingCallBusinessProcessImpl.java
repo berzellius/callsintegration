@@ -47,6 +47,12 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     private Long phoneNumberCustomField;
     private Long phoneNumberCustomFieldLeads;
 
+    /**
+     * Id поля "email" для контактов и сделок
+     */
+    private Long emailContactCustomField;
+    private String emailContactEnum;
+
     /*
      * Id кастомных полей "Рекламный канал" для контактов и сделок
      */
@@ -63,7 +69,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
      * Привязки {id проекта calltracking}=>{enum значение поля "Источник"}
      */
     private HashMap<Integer, Long> projectIdToContactsSource;
-    private HashMap<Integer, Long> projectIdToLeadsSource;
+    private HashMap<Integer, Long> projectIdToLeadsSource;;
 
     @Override
     public void newIncomingCall(Call call) {
@@ -312,6 +318,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         amoCRMService.addContact(amoCRMContact);
     }
 
+    @Override
     public Long getPhoneNumberCustomField() {
         return phoneNumberCustomField;
     }
@@ -320,6 +327,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.phoneNumberCustomField = phoneNumberCustomField;
     }
 
+    @Override
     public Long getDefaultUserId() {
         return defaultUserId;
     }
@@ -328,6 +336,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.defaultUserId = defaultUserId;
     }
 
+    @Override
     public Long getPhoneNumberCustomFieldLeads() {
         return phoneNumberCustomFieldLeads;
     }
@@ -336,6 +345,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.phoneNumberCustomFieldLeads = phoneNumberCustomFieldLeads;
     }
 
+    @Override
     public Long getMarketingChannelContactsCustomField() {
         return marketingChannelContactsCustomField;
     }
@@ -344,6 +354,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.marketingChannelContactsCustomField = marketingChannelContactsCustomField;
     }
 
+    @Override
     public Long getMarketingChannelLeadsCustomField() {
         return marketingChannelLeadsCustomField;
     }
@@ -352,6 +363,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.marketingChannelLeadsCustomField = marketingChannelLeadsCustomField;
     }
 
+    @Override
     public Long getSourceContactsCustomField() {
         return sourceContactsCustomField;
     }
@@ -360,6 +372,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.sourceContactsCustomField = sourceContactsCustomField;
     }
 
+    @Override
     public Long getSourceLeadsCustomField() {
         return sourceLeadsCustomField;
     }
@@ -382,5 +395,24 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
     public void setProjectIdToLeadsSource(HashMap<Integer, Long> projectIdToLeadsSource) {
         this.projectIdToLeadsSource = projectIdToLeadsSource;
+    }
+
+    public void setEmailContactCustomField(Long emailContactCustomField) {
+        this.emailContactCustomField = emailContactCustomField;
+    }
+
+    @Override
+    public Long getEmailContactCustomField() {
+        return emailContactCustomField;
+    }
+
+    @Override
+    public String getEmailContactEnum() {
+        return emailContactEnum;
+    }
+
+    @Override
+    public void setEmailContactEnum(String emailContactEnum) {
+        this.emailContactEnum = emailContactEnum;
     }
 }

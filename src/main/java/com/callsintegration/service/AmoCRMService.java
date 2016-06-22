@@ -36,6 +36,8 @@ public interface AmoCRMService {
 
     List<AmoCRMNote> getNotesByTypeAndElementId(String type, Long elementId) throws APIAuthException;
 
+    AmoCRMContact getContactById(Long contactId) throws APIAuthException;
+
     AmoCRMLead getLeadById(Long leadId) throws APIAuthException;
 
     AmoCRMCreatedEntityResponse addLead(AmoCRMLead amoCRMLead) throws APIAuthException;
