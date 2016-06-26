@@ -112,6 +112,11 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
         if(leadFromSite.getSite() != null && leadFromSite.getLead() != null) {
             log.info("Started processing lead from site " + leadFromSite.getSite().getUrl() + "; contacts: " + leadFromSite.getLead().getPhone() + " / " + leadFromSite.getLead().getEmail());
 
+            // Приводим номер к общему формату
+            if(leadFromSite.getLead().getPhone() != null){
+                leadFromSite.getLead().setPhone("7" + this.phoneExec(leadFromSite.getLead().getPhone()));
+            }
+
             String utmSource = (leadFromSite.getLead().getUtm_source() != null)? leadFromSite.getLead().getUtm_source() : "";
             String utmMedium = (leadFromSite.getLead().getUtm_medium() != null)? leadFromSite.getLead().getUtm_medium() : "";
             String utmCampaign = (leadFromSite.getLead().getUtm_campaign() != null)? leadFromSite.getLead().getUtm_campaign() : "";
@@ -273,6 +278,33 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
         }
 
         return null;
+    }
+
+    private String phoneExec(String phone){
+        log.info("parsing phone: ".concat(phone));
+
+        if(phone.matches("^[\\d]+$")){
+            if(phone.length() >= 11 &&
+                    (
+                            phone.charAt(0) == '7' ||
+                                    phone.charAt(0) == '8'
+                    )
+                    ){
+                return phone.substring(1);
+            }
+            return phone;
+        }
+        else{
+            String parsed = "";
+            for (Integer i = 0; i < phone.length(); i++){
+                String ch = String.valueOf(phone.charAt(i));
+                if(ch.matches("\\d")){
+                    parsed = parsed.concat(ch);
+                }
+            }
+
+            return phoneExec(parsed);
+        }
     }
 
     public Long getUtmSourceCustomFieldId() {

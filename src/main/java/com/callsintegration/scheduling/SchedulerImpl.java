@@ -20,7 +20,7 @@ import java.util.Date;
 /**
  * Created by berz on 20.09.2015.
  */
-/*@Component*/
+@Component
 public class SchedulerImpl implements MainScheduler {
 
     @Autowired
