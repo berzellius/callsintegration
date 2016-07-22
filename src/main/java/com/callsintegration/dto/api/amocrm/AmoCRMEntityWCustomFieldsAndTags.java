@@ -24,8 +24,23 @@ public class AmoCRMEntityWCustomFieldsAndTags extends AmoCRMEntityWCustomFields 
         this.tags = tags;
     }
 
+    public void tag(Long tagId, String tagName){
+        if(tagId == null || tagName == null)
+            return;
+
+        if(!hasTagById(tagId)){
+            if(this.getTags() == null){
+                this.setTags(new ArrayList<>());
+            }
+
+            this.getTags().add(new AmoCRMTag(tagId, tagName));
+        }
+    }
 
     public boolean hasTagById(Long tagId) {
+        if(this.getTags() == null)
+            return false;
+
         for(AmoCRMTag amoCRMTag : this.getTags()){
             if(amoCRMTag.getId().equals(tagId)){
                 return true;

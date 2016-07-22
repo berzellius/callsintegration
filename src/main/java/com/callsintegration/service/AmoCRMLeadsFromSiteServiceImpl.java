@@ -195,6 +195,8 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
         String[] fieldSource = {sourceName};
         lead.addStringValuesToCustomField(incomingCallBusinessProcess.getMarketingChannelLeadsCustomField(), fieldSource);
 
+        lead.tag(193659l, "Заявка с сайта");
+
         log.info("creating lead for leadFromSite..");
 
         AmoCRMCreatedEntityResponse amoCRMCreatedEntityResponse = amoCRMService.addLead(lead);
@@ -301,6 +303,11 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
                 if(ch.matches("\\d")){
                     parsed = parsed.concat(ch);
                 }
+            }
+
+            if(parsed.length() == 0){
+                log.error("Seems to be that number contains no digits. Cant parse it");
+                return "";
             }
 
             return phoneExec(parsed);

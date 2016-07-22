@@ -5,6 +5,7 @@ import com.callsintegration.dto.api.ErrorHandlers.AmoCRMAPIRequestErrorHandler;
 import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHandler;
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
 import com.callsintegration.service.*;
+import com.callsintegration.settings.APISettings;
 import com.callsintegration.settings.LocalProjectSettings;
 import com.callsintegration.settings.ProjectSettings;
 import com.callsintegration.settings.RemoteProjectSettings;
@@ -107,10 +108,10 @@ public class ServiceBeanConfiguration {
         callTrackingAPIService.setLoginURL("https://calltracking.ru/api/login.php");
         callTrackingAPIService.setLoginMethod(HttpMethod.POST);
 
-        callTrackingAPIService.setLogin("info@home-motion.ru");
-        callTrackingAPIService.setPassword("SsX0d1XE75");
-        callTrackingAPIService.setWebSiteLogin("info@home-motion.ru");
-        callTrackingAPIService.setWebSitePassword("SsX0d1XE75");
+        callTrackingAPIService.setLogin(APISettings.CallTrackingLogin);
+        callTrackingAPIService.setPassword(APISettings.CallTrackingPassword);
+        callTrackingAPIService.setWebSiteLogin(APISettings.CallTrackingWebLogin);
+        callTrackingAPIService.setWebSitePassword(APISettings.CallTrackingWebPassword);
         callTrackingAPIService.setWebSiteLoginUrl("https://calltracking.ru/admin/login");
         Integer[] projects = {3901, 3400, 4318, 4319};
         callTrackingAPIService.setProjects(projects);
@@ -129,8 +130,8 @@ public class ServiceBeanConfiguration {
     @Bean
     public AmoCRMService amoCRMService(){
         AmoCRMService amoCRMService = new AmoCRMServiceImpl();
-        amoCRMService.setUserLogin("elektro-karniz@yandex.ru");
-        amoCRMService.setUserHash("e45c8a138cfb6ac531ab61708d2fbb71");
+        amoCRMService.setUserLogin(APISettings.AmoCRMUser);
+        amoCRMService.setUserHash(APISettings.AmoCRMHash);
         amoCRMService.setLoginUrl("https://elektrokarniz.amocrm.ru/private/api/auth.php?type=json");
         amoCRMService.setApiBaseUrl("https://elektrokarniz.amocrm.ru/private/api/v2/json/");
 

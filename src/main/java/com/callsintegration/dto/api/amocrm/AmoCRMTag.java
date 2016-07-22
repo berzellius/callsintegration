@@ -15,6 +15,11 @@ public class AmoCRMTag {
     private String name;
     private Long id;
 
+    public AmoCRMTag(Long tagId, String tagName) {
+        this.setName(tagName);
+        this.setId(tagId);
+    }
+
     public String getName() {
         return name;
     }
