@@ -136,6 +136,7 @@ public class ServiceBeanConfiguration {
         amoCRMService.setApiBaseUrl("https://elektrokarniz.amocrm.ru/private/api/v2/json/");
 
         ArrayList<Long> leadClosedStatusesIds = new ArrayList<>();
+
         leadClosedStatusesIds.add(142l);
         leadClosedStatusesIds.add(143l);
 
