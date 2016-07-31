@@ -3,6 +3,7 @@ package com.callsintegration.batch;
 import com.callsintegration.dmodel.Call;
 import com.callsintegration.reader.CallTrackingCallsReader;
 import com.callsintegration.repository.CallRepository;
+import com.callsintegration.service.CallTrackingAPIService;
 import com.callsintegration.service.CallsService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -49,6 +50,9 @@ public class CallsImportBatchConfiguration {
     @Autowired
     private CallRepository callRepository;
 
+    @Autowired
+    private CallTrackingAPIService callTrackingAPIService;
+
     @Bean
     public ItemReader<List<Call>> callsReader() throws ParseException {
 
@@ -66,7 +70,7 @@ public class CallsImportBatchConfiguration {
                 System.out.println("process calls: " + calls);
 
                 for(Call call : calls){
-                    call.setDtmCreate(new Date());
+                    callTrackingAPIService.processCallOnImport(call);
                 }
 
                 return calls;
