@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by berz on 10.10.2015.
@@ -167,6 +164,10 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
             log.info("We need to create lead for contact #" + contact.getId());
             AmoCRMLead amoCRMLeadToWorkWith = this.createLeadForContact(contact, call);
         }
+        else{
+            log.info("Found leads for contact #" + contact.getId() + ". We need to create task for new call");
+            this.createTasksForCall(contact, call);
+        }
 
 
         /*
@@ -206,6 +207,19 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
         amoCRMService.addNoteToLead(amoCRMNote, amoCRMLeadToWorkWith);
         */
+    }
+
+    private void createTasksForCall(AmoCRMContact contact, Call call) throws APIAuthException {
+        AmoCRMTask amoCRMTask = new AmoCRMTask();
+        amoCRMTask.setResponsible_user_id(getDefaultUserId());
+        amoCRMTask.setContact(contact);
+
+        // Связаться с клиентом
+        amoCRMTask.setTask_type(1l);
+        amoCRMTask.setText("Повторный звонок от клиента!");
+        amoCRMTask.setComplete_till(new Date());
+
+        amoCRMService.addTask(amoCRMTask);
     }
 
     private void checkExistingLeadCustomFields(AmoCRMLead amoCRMLead, Call call) throws APIAuthException {

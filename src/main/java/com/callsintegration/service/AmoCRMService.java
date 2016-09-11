@@ -18,6 +18,12 @@ public interface AmoCRMService {
 
     AmoCRMCreatedEntityResponse addContact(AmoCRMContact amoCRMContact) throws APIAuthException;
 
+    AmoCRMCreatedTasksResponse editTasks(AmoCRMEntities amoCRMEntities) throws APIAuthException;
+
+    List<AmoCRMCreatedEntityResponse> addTasks(ArrayList<AmoCRMTask> amoCRMTasks) throws APIAuthException;
+
+    AmoCRMCreatedEntityResponse addTask(AmoCRMTask amoCRMTask) throws APIAuthException;
+
     AmoCRMCreatedContactsResponse editContacts(AmoCRMEntities amoCRMEntities) throws APIAuthException;
 
     void addContactToLead(AmoCRMContact amoCRMContact, AmoCRMLead amoCRMLead) throws APIAuthException;

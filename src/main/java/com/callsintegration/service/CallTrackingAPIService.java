@@ -71,4 +71,6 @@ public interface CallTrackingAPIService {
     String getWebSiteLoginMethod();
 
     void setWebSiteLoginMethod(String webSiteLoginMethod);
+
+    void processCallOnImport(Call call);
 }

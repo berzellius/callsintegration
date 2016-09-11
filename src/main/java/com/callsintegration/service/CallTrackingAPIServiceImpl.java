@@ -542,5 +542,19 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
         this.webSiteLoginMethod = webSiteLoginMethod;
     }
 
+    @Override
+    public void processCallOnImport(Call call) {
+        call.setDtmCreate(new Date());
+
+        if(call.getNumber() != null){
+            if(call.getNumber().length() >= 11 &&
+                    (
+                            call.getNumber().charAt(0) == '7'
+                    )){
+                call.setNumber(call.getNumber().substring(1));
+            }
+        }
+    }
+
 
 }

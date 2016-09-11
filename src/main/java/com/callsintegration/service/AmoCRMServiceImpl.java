@@ -101,6 +101,52 @@ public class AmoCRMServiceImpl implements AmoCRMService {
     }
 
     @Override
+    public AmoCRMCreatedTasksResponse editTasks(AmoCRMEntities amoCRMEntities) throws APIAuthException {
+        AmoCRMTaskPostRequest amoCRMTaskPostRequest = new AmoCRMTaskPostRequest();
+        amoCRMTaskPostRequest.setTasks(amoCRMEntities);
+
+        AmoCRMPostRequest amoCRMJsonRequest = new AmoCRMPostRequest(amoCRMTaskPostRequest);
+
+        HttpEntity<AmoCRMCreatedTasksResponse> amoCRMCreatedTasksResponse = request(amoCRMJsonRequest, "tasks/set", AmoCRMCreatedTasksResponse.class);
+        if (amoCRMCreatedTasksResponse.getBody() == null) {
+            throw new IllegalStateException("Ошибка в ходе обновления контактов! Пришел пустой ответ от AmoCRM API.");
+        }
+
+        return amoCRMCreatedTasksResponse.getBody();
+    }
+
+    @Override
+    public List<AmoCRMCreatedEntityResponse> addTasks(ArrayList<AmoCRMTask> amoCRMTasks) throws APIAuthException {
+        AmoCRMEntities amoCRMEntities = new AmoCRMEntities();
+        amoCRMEntities.setAdd(amoCRMTasks);
+
+        AmoCRMCreatedTasksResponse amoCRMCreatedTasksResponse = this.editTasks(amoCRMEntities);
+
+        if(
+                amoCRMCreatedTasksResponse.getResponse() == null ||
+                    amoCRMCreatedTasksResponse.getResponse().getTasks().getAdd().size() != amoCRMTasks.size()
+                ){
+            throw new IllegalStateException("Задача не создана! Не возвращены все id созданных элементов!");
+        }
+
+        return amoCRMCreatedTasksResponse.getResponse().getTasks().getAdd();
+    }
+
+    @Override
+    public AmoCRMCreatedEntityResponse addTask(AmoCRMTask amoCRMTask) throws APIAuthException {
+        ArrayList<AmoCRMTask> amoCRMTasks = new ArrayList<>();
+        amoCRMTasks.add(amoCRMTask);
+
+        List<AmoCRMCreatedEntityResponse> responses = this.addTasks(amoCRMTasks);
+
+        if(responses == null){
+            throw new IllegalStateException("Задача не создана! (Ответ от AmoCRM пустой)");
+        }
+
+        return responses.get(0);
+    }
+
+    @Override
     public AmoCRMCreatedEntityResponse addContact(AmoCRMContact amoCRMContact) throws APIAuthException {
         AmoCRMEntities amoCRMEntities = new AmoCRMEntities();
         ArrayList<AmoCRMContact> amoCRMContacts = new ArrayList<>();

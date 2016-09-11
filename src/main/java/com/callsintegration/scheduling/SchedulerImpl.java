@@ -138,16 +138,16 @@ public class SchedulerImpl implements MainScheduler {
 
     /*
     *
-    * 3600 сек = 60 минут
+    * 60 сек
      */
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 60000)
     @Override
     public void callsToCRM(){
-        int hour = hourOfDay();
+        //int hour = hourOfDay();
 
-        if(hour >= 22 || hour <= 8) {
+        //if(hour >= 22 || hour <= 8) {
             runImportCallsToCRM();
-        }
+        //}
     }
 
 
