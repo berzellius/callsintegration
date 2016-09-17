@@ -126,6 +126,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
             if (contact == null) {
                 log.info("All found contacts for number " + number + " is wrong");
+                throw new IllegalStateException("All found contacts for number " + number + " is wrong");
             } else {
                 log.info("Got contact #" + contact.getId().toString() + " for number " + number + "!");
                 this.workWithContact(contact, call);
@@ -292,7 +293,10 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         String number = call.getNumber();
         AmoCRMLead amoCRMLead = new AmoCRMLead();
         amoCRMLead.setName("Автоматически -> " + contact.getName());
-        amoCRMLead.setResponsible_user_id(this.getDefaultUserId());
+
+        Long responsibleUserID = contact.getResponsible_user_id() != null ? contact.getResponsible_user_id() : this.getDefaultUserId();
+
+        amoCRMLead.setResponsible_user_id(responsibleUserID);
         String[] numberField = {number};
         amoCRMLead.addStringValuesToCustomField(this.getPhoneNumberCustomFieldLeads(), numberField);
         String[] sourceField = {call.getSource()};
