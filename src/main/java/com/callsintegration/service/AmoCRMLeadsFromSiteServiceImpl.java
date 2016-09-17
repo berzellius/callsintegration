@@ -2,11 +2,13 @@ package com.callsintegration.service;
 
 import com.callsintegration.dmodel.CallTrackingSourceCondition;
 import com.callsintegration.dmodel.LeadFromSite;
+import com.callsintegration.dmodel.Site;
 import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
 import com.callsintegration.dto.site.Lead;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.LeadFromSiteRepository;
+import com.callsintegration.repository.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,9 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     @Autowired
     LeadFromSiteRepository leadFromSiteRepository;
+
+    @Autowired
+    SiteRepository siteRepository;
 
 
     @Override
@@ -351,6 +356,13 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     }
 
     public HashMap<Integer, Long> getProjectIdToLeadsSource() {
+        if(projectIdToLeadsSource.size() == 0){
+            log.debug("updating projectIdToLeadsSource in AmoCRMLeadsFromSiteServiceImpl");
+            List<Site> sites = (List<Site>) siteRepository.findAll();
+            for(Site site : sites){
+                projectIdToLeadsSource.put(site.getCallTrackingProjectId(), Long.decode(site.getCrmLeadSourceId()));
+            }
+        }
         return projectIdToLeadsSource;
     }
 

@@ -33,7 +33,7 @@ import java.util.Properties;
 @Configuration
 public class ServiceBeanConfiguration {
 
-    HashMap<Integer, Long> projectIdToLeadsSource() {
+    /*HashMap<Integer, Long> projectIdToLeadsSource() {
         HashMap<Integer, Long> projectIdToLeadsSource = new HashMap<>();
         projectIdToLeadsSource.put(3901, 1324014l);
         projectIdToLeadsSource.put(3400, 1324016l);
@@ -41,7 +41,7 @@ public class ServiceBeanConfiguration {
         projectIdToLeadsSource.put(4319, 1335876l);
 
         return projectIdToLeadsSource;
-    }
+    }*/
 
     Long sourceLeadsCustomField(){
         return 561444l;
@@ -113,7 +113,7 @@ public class ServiceBeanConfiguration {
         callTrackingAPIService.setWebSiteLogin(APISettings.CallTrackingWebLogin);
         callTrackingAPIService.setWebSitePassword(APISettings.CallTrackingWebPassword);
         callTrackingAPIService.setWebSiteLoginUrl("https://calltracking.ru/admin/login");
-        Integer[] projects = {3901, 3400, 4318, 4319};
+        Integer[] projects = {3901, 3400, 4318, 4319, 4590, 4539};
         callTrackingAPIService.setProjects(projects);
 
         CalltrackingAPIRequestErrorHandler errorHandler = new CalltrackingAPIRequestErrorHandler();
@@ -163,16 +163,16 @@ public class ServiceBeanConfiguration {
         incomingCallBusinessProcess.setEmailContactEnum("1084672");
         incomingCallBusinessProcess.setSourceLeadsCustomField(sourceLeadsCustomField());
 
-        HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
+        /*HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
         projectIdToContactsSource.put(3901, 1324018l);
         projectIdToContactsSource.put(3400, 1324020l);
         projectIdToContactsSource.put(4318, 1338944l);
-        projectIdToContactsSource.put(4319, 1335878l);
+        projectIdToContactsSource.put(4319, 1335878l);*/
 
-        HashMap<Integer, Long> projectIdToLeadsSource = projectIdToLeadsSource();
+        //HashMap<Integer, Long> projectIdToLeadsSource = projectIdToLeadsSource();
 
-        incomingCallBusinessProcess.setProjectIdToContactsSource(projectIdToContactsSource);
-        incomingCallBusinessProcess.setProjectIdToLeadsSource(projectIdToLeadsSource);
+        //incomingCallBusinessProcess.setProjectIdToContactsSource(projectIdToContactsSource);
+        //incomingCallBusinessProcess.setProjectIdToLeadsSource(projectIdToLeadsSource);
 
         return incomingCallBusinessProcess;
     }
@@ -199,7 +199,7 @@ public class ServiceBeanConfiguration {
         amoCRMLeadsFromSiteService.setUtmCampaignCustomFieldId(568310l);
         amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldId(576380l);
         amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(1353964l);
-        amoCRMLeadsFromSiteService.setProjectIdToLeadsSource(projectIdToLeadsSource());
+       // amoCRMLeadsFromSiteService.setProjectIdToLeadsSource(projectIdToLeadsSource());
         amoCRMLeadsFromSiteService.setSourceLeadsCustomField(sourceLeadsCustomField());
 
         return amoCRMLeadsFromSiteService;

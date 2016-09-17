@@ -1,11 +1,13 @@
 package com.callsintegration.service;
 
 import com.callsintegration.dmodel.Call;
+import com.callsintegration.dmodel.Site;
 import com.callsintegration.dto.api.amocrm.*;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedLeadsResponse;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
+import com.callsintegration.repository.SiteRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -30,6 +32,9 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
     @Autowired
     AmoCRMService amoCRMService;
+
+    @Autowired
+    SiteRepository siteRepository;
 
     private static final Logger log = LoggerFactory.getLogger(IncomingCallBusinessProcessImpl.class);
 
@@ -65,8 +70,8 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     /*
      * Привязки {id проекта calltracking}=>{enum значение поля "Источник"}
      */
-    private HashMap<Integer, Long> projectIdToContactsSource;
-    private HashMap<Integer, Long> projectIdToLeadsSource;;
+    //private HashMap<Integer, Long> projectIdToContactsSource;
+    private HashMap<Integer, Long> projectIdToLeadsSource;
 
     @Override
     public void newIncomingCall(Call call) {
@@ -320,7 +325,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         return amoCRMLead1;
     }
 
-    private void createContact(Call call) throws APIAuthException {
+    /*private void createContact(Call call) throws APIAuthException {
         String number = call.getNumber();
 
         AmoCRMContact amoCRMContact = new AmoCRMContact();
@@ -334,7 +339,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         amoCRMContact.addStringValuesToCustomField(this.getSourceContactsCustomField(), fieldProject);
 
         amoCRMService.addContact(amoCRMContact);
-    }
+    }*/
 
     @Override
     public Long getPhoneNumberCustomField() {
@@ -399,6 +404,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         this.sourceLeadsCustomField = sourceLeadsCustomField;
     }
 
+/*
     public HashMap<Integer, Long> getProjectIdToContactsSource() {
         return projectIdToContactsSource;
     }
@@ -406,8 +412,16 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     public void setProjectIdToContactsSource(HashMap<Integer, Long> projectIdToContactsSource) {
         this.projectIdToContactsSource = projectIdToContactsSource;
     }
+*/
 
     public HashMap<Integer, Long> getProjectIdToLeadsSource() {
+        if(projectIdToLeadsSource.size() == 0){
+            log.debug("updating projectIdToLeadsSource in incomingBusinessProcessImpl");
+            List<Site> sites = (List<Site>) siteRepository.findAll();
+            for(Site site : sites){
+                projectIdToLeadsSource.put(site.getCallTrackingProjectId(), Long.decode(site.getCrmLeadSourceId()));
+            }
+        }
         return projectIdToLeadsSource;
     }
 
