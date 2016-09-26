@@ -33,7 +33,19 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     private Long newLeadFromSiteStatusCustomFieldId;
     private Long newLeadFromSiteStatusCustomFieldEnumNotProcessed;
 
+    private Long phoneNumberCustomFieldLeads;
+    private Long phoneNumberCustomField;
+    private Long defaultUserID;
+    private Long marketingChannelContactsCustomField;
+    private Long marketingChannelLeadsCustomField;
+    private Long emailContactCustomField;
+    private String emailContactEnum;
+    private Long phoneNumberContactStockField;
+    private String phoneNumberStockFieldContactEnumWork;
+
+
     private Long sourceLeadsCustomField;
+    private Long sourceContactsCustomField;
 
     private HashMap<Integer, Long> projectIdToLeadsSource;
 
@@ -53,6 +65,7 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     @Autowired
     SiteRepository siteRepository;
+
 
 
     @Override
@@ -187,18 +200,18 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
         AmoCRMLead lead = new AmoCRMLead();
 
         lead.setName("Заявка с сайта -> " + this.contactStrByLead(leadFromSite.getLead()));
-        lead.setResponsible_user_id(incomingCallBusinessProcess.getDefaultUserId());
+        lead.setResponsible_user_id(this.getDefaultUserID());
 
         if(leadFromSite.getLead().getPhone() != null){
             String[] numberField = {leadFromSite.getLead().getPhone()};
-            lead.addStringValuesToCustomField(incomingCallBusinessProcess.getPhoneNumberCustomFieldLeads(), numberField);
+            lead.addStringValuesToCustomField(this.getPhoneNumberCustomFieldLeads(), numberField);
         }
 
         String[] fieldProject = {leadFromSite.getSite().getCrmLeadSourceId()};
-        lead.addStringValuesToCustomField(incomingCallBusinessProcess.getSourceLeadsCustomField(), fieldProject);
+        lead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), fieldProject);
 
         String[] fieldSource = {sourceName};
-        lead.addStringValuesToCustomField(incomingCallBusinessProcess.getMarketingChannelLeadsCustomField(), fieldSource);
+        lead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), fieldSource);
 
         lead.tag(193659l, "Заявка с сайта");
 
@@ -257,23 +270,24 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
         AmoCRMContact amoCRMContact = new AmoCRMContact();
         amoCRMContact.setName(lead.getName() + " (с сайта " + lead.getOrigin() + ") :[" + contacts + "]");
-        amoCRMContact.setResponsible_user_id(incomingCallBusinessProcess.getDefaultUserId());
+        amoCRMContact.setResponsible_user_id(this.getDefaultUserID());
 
         if(lead.getPhone() != null){
             String[] fieldNumber = {lead.getPhone()};
-            amoCRMContact.addStringValuesToCustomField(incomingCallBusinessProcess.getPhoneNumberCustomField(), fieldNumber);
+            amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberCustomField(), fieldNumber);
+            amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberContactStockField(), fieldNumber, this.getPhoneNumberStockFieldContactEnumWork());
         }
 
         if(lead.getEmail() != null){
             String[] fieldEmail = {lead.getEmail()};
-            amoCRMContact.addStringValuesToCustomField(incomingCallBusinessProcess.getEmailContactCustomField(), fieldEmail, incomingCallBusinessProcess.getEmailContactEnum());
+            amoCRMContact.addStringValuesToCustomField(this.getEmailContactCustomField(), fieldEmail, this.getEmailContactEnum());
         }
 
         String[] fieldProject = {leadFromSite.getSite().getCrmContactSourceId()};
-        amoCRMContact.addStringValuesToCustomField(incomingCallBusinessProcess.getSourceContactsCustomField(), fieldProject);
+        amoCRMContact.addStringValuesToCustomField(this.getSourceContactsCustomField(), fieldProject);
 
         String[] fieldSource = {sourceName};
-        amoCRMContact.addStringValuesToCustomField(incomingCallBusinessProcess.getMarketingChannelContactsCustomField(), fieldSource);
+        amoCRMContact.addStringValuesToCustomField(this.getMarketingChannelContactsCustomField(), fieldSource);
 
 
         AmoCRMCreatedEntityResponse response = amoCRMService.addContact(amoCRMContact);
@@ -396,5 +410,95 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     @Override
     public void setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(Long newLeadFromSiteStatusCustomFieldEnumNotProcessed) {
         this.newLeadFromSiteStatusCustomFieldEnumNotProcessed = newLeadFromSiteStatusCustomFieldEnumNotProcessed;
+    }
+
+    public Long getPhoneNumberCustomFieldLeads() {
+        return phoneNumberCustomFieldLeads;
+    }
+
+    @Override
+    public void setPhoneNumberCustomFieldLeads(Long phoneNumberCustomFieldLeads) {
+        this.phoneNumberCustomFieldLeads = phoneNumberCustomFieldLeads;
+    }
+
+    public Long getPhoneNumberCustomField() {
+        return phoneNumberCustomField;
+    }
+
+    @Override
+    public void setPhoneNumberCustomField(Long phoneNumberCustomField) {
+        this.phoneNumberCustomField = phoneNumberCustomField;
+    }
+
+    public Long getDefaultUserID() {
+        return defaultUserID;
+    }
+
+    @Override
+    public void setDefaultUserID(Long defaultUserID) {
+        this.defaultUserID = defaultUserID;
+    }
+
+    public Long getMarketingChannelContactsCustomField() {
+        return marketingChannelContactsCustomField;
+    }
+
+    @Override
+    public void setMarketingChannelContactsCustomField(Long marketingChannelContactsCustomField) {
+        this.marketingChannelContactsCustomField = marketingChannelContactsCustomField;
+    }
+
+    public Long getEmailContactCustomField() {
+        return emailContactCustomField;
+    }
+
+    @Override
+    public void setEmailContactCustomField(Long emailContactCustomField) {
+        this.emailContactCustomField = emailContactCustomField;
+    }
+
+    public String getEmailContactEnum() {
+        return emailContactEnum;
+    }
+
+    @Override
+    public void setEmailContactEnum(String emailContactEnum) {
+        this.emailContactEnum = emailContactEnum;
+    }
+
+    public Long getSourceContactsCustomField() {
+        return sourceContactsCustomField;
+    }
+
+    @Override
+    public void setSourceContactsCustomField(Long sourceContactsCustomField) {
+        this.sourceContactsCustomField = sourceContactsCustomField;
+    }
+
+    public Long getMarketingChannelLeadsCustomField() {
+        return marketingChannelLeadsCustomField;
+    }
+
+    @Override
+    public void setMarketingChannelLeadsCustomField(Long marketingChannelLeadsCustomField) {
+        this.marketingChannelLeadsCustomField = marketingChannelLeadsCustomField;
+    }
+
+    @Override
+    public void setPhoneNumberContactStockField(Long amoCRMPhoneNumberStockFieldContact) {
+        this.phoneNumberContactStockField = amoCRMPhoneNumberStockFieldContact;
+    }
+
+    public Long getPhoneNumberContactStockField() {
+        return phoneNumberContactStockField;
+    }
+
+    public String getPhoneNumberStockFieldContactEnumWork() {
+        return phoneNumberStockFieldContactEnumWork;
+    }
+
+    @Override
+    public void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork) {
+        this.phoneNumberStockFieldContactEnumWork = phoneNumberStockFieldContactEnumWork;
     }
 }

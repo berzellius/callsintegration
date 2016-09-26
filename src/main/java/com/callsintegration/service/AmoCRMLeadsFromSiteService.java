@@ -31,4 +31,24 @@ public interface AmoCRMLeadsFromSiteService {
     void setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(Long newLeadFromSiteStatusCustomFieldEnumNotProcessed);
 
     LeadFromSite processLeadFromSite(LeadFromSite leadFromSite) throws APIAuthException;
+
+    void setPhoneNumberCustomFieldLeads(Long phoneNumberCustomFieldLeads);
+
+    void setPhoneNumberCustomField(Long phoneNumberCustomField);
+
+    void setDefaultUserID(Long defaultUserID);
+
+    void setMarketingChannelContactsCustomField(Long marketingChannelContactsCustomField);
+
+    void setEmailContactCustomField(Long emailContactCustomField);
+
+    void setEmailContactEnum(String emailContactEnum);
+
+    void setSourceContactsCustomField(Long sourceContactsCustomField);
+
+    void setMarketingChannelLeadsCustomField(Long marketingChannelLeadsCustomField);
+
+    void setPhoneNumberContactStockField(Long amoCRMPhoneNumberStockFieldContact);
+
+    void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork);
 }

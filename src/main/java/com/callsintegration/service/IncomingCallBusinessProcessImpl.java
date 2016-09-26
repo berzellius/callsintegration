@@ -332,7 +332,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         amoCRMContact.setName("CallTracking:[" + number + "]");
         amoCRMContact.setResponsible_user_id(this.getDefaultUserId());
         String[] fieldNumber = {number};
-        amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberCustomField(), fieldNumber);
+        amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberCustomFieldLeads(), fieldNumber);
         String[] fieldSource = {call.getSource()};
         amoCRMContact.addStringValuesToCustomField(this.getMarketingChannelContactsCustomField(), fieldSource);
         String[] fieldProject = {this.getProjectIdToContactsSource().get(call.getProjectId()).toString()};

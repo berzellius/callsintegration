@@ -6,7 +6,6 @@ import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHan
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
 import com.callsintegration.service.*;
 import com.callsintegration.settings.APISettings;
-import com.callsintegration.settings.LocalProjectSettings;
 import com.callsintegration.settings.ProjectSettings;
 import com.callsintegration.settings.RemoteProjectSettings;
 import org.springframework.context.annotation.Bean;
@@ -16,16 +15,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
-import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.springframework.web.servlet.view.ResourceBundleViewResolver;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by berz on 20.10.14.
@@ -44,7 +37,7 @@ public class ServiceBeanConfiguration {
     }*/
 
     Long sourceLeadsCustomField(){
-        return 561444l;
+        return APISettings.AmoCRMSourceLeadsCustomField;
     }
 
     @Bean
@@ -103,18 +96,17 @@ public class ServiceBeanConfiguration {
         CallTrackingAPIService callTrackingAPIService = new CallTrackingAPIServiceImpl();
 
         callTrackingAPIService.setApiMethod(HttpMethod.POST);
-        callTrackingAPIService.setApiURL("https://calltracking.ru/api/get_data.php");
+        callTrackingAPIService.setApiURL(APISettings.CallTrackingAPIUrl);
 
-        callTrackingAPIService.setLoginURL("https://calltracking.ru/api/login.php");
+        callTrackingAPIService.setLoginURL(APISettings.CallTrackingAPILoginUrl);
         callTrackingAPIService.setLoginMethod(HttpMethod.POST);
 
         callTrackingAPIService.setLogin(APISettings.CallTrackingLogin);
         callTrackingAPIService.setPassword(APISettings.CallTrackingPassword);
         callTrackingAPIService.setWebSiteLogin(APISettings.CallTrackingWebLogin);
         callTrackingAPIService.setWebSitePassword(APISettings.CallTrackingWebPassword);
-        callTrackingAPIService.setWebSiteLoginUrl("https://calltracking.ru/admin/login");
-        Integer[] projects = {3901, 3400, 4318, 4319, 4590, 4539};
-        callTrackingAPIService.setProjects(projects);
+        callTrackingAPIService.setWebSiteLoginUrl(APISettings.CallTrackingLoginUrl);
+        callTrackingAPIService.setProjects(APISettings.CallTrackingProjects);
 
         CalltrackingAPIRequestErrorHandler errorHandler = new CalltrackingAPIRequestErrorHandler();
         callTrackingAPIService.setErrorHandler(errorHandler);
@@ -132,19 +124,15 @@ public class ServiceBeanConfiguration {
         AmoCRMService amoCRMService = new AmoCRMServiceImpl();
         amoCRMService.setUserLogin(APISettings.AmoCRMUser);
         amoCRMService.setUserHash(APISettings.AmoCRMHash);
-        amoCRMService.setLoginUrl("https://elektrokarniz.amocrm.ru/private/api/auth.php?type=json");
-        amoCRMService.setApiBaseUrl("https://elektrokarniz.amocrm.ru/private/api/v2/json/");
+        amoCRMService.setLoginUrl(APISettings.AmoCRMLoginUrl);
+        amoCRMService.setApiBaseUrl(APISettings.AmoCRMApiBaseUrl);
 
-        ArrayList<Long> leadClosedStatusesIds = new ArrayList<>();
-
-        leadClosedStatusesIds.add(142l);
-        leadClosedStatusesIds.add(143l);
+        ArrayList<Long> leadClosedStatusesIds = new ArrayList<>(Arrays.asList(APISettings.AmoCRMLeadClosedStatuses));
+        amoCRMService.setLeadClosedStatusesIDs(leadClosedStatusesIds);
 
         AmoCRMAPIRequestErrorHandler errorHandler = new AmoCRMAPIRequestErrorHandler();
         amoCRMService.setErrorHandler(errorHandler);
-        amoCRMService.setMaxRelogins(5);
-
-        amoCRMService.setLeadClosedStatusesIDs(leadClosedStatusesIds);
+        amoCRMService.setMaxRelogins(APISettings.AmoCRMMaxRelogins);
 
         return amoCRMService;
     }
@@ -153,14 +141,14 @@ public class ServiceBeanConfiguration {
     public IncomingCallBusinessProcess incomingCallBusinessProcess(){
         IncomingCallBusinessProcessImpl incomingCallBusinessProcess = new IncomingCallBusinessProcessImpl();
 
-        incomingCallBusinessProcess.setDefaultUserId(543159l);
-        incomingCallBusinessProcess.setPhoneNumberCustomField(561024l);
-        incomingCallBusinessProcess.setPhoneNumberCustomFieldLeads(561026l);
-        incomingCallBusinessProcess.setMarketingChannelContactsCustomField(561442l);
-        incomingCallBusinessProcess.setMarketingChannelLeadsCustomField(561440l);
-        incomingCallBusinessProcess.setSourceContactsCustomField(561446l);
-        incomingCallBusinessProcess.setEmailContactCustomField(459344l);
-        incomingCallBusinessProcess.setEmailContactEnum("1084672");
+        incomingCallBusinessProcess.setDefaultUserId(APISettings.AmoCRMDefaultUserID);
+        incomingCallBusinessProcess.setPhoneNumberCustomField(APISettings.AmoCRMPhoneNumberCustomField);
+        incomingCallBusinessProcess.setPhoneNumberCustomFieldLeads(APISettings.AmoCRMPhoneNumberCustomFieldLeads);
+        incomingCallBusinessProcess.setMarketingChannelContactsCustomField(APISettings.AmoCRMMarketingChannelContactsCustomField);
+        incomingCallBusinessProcess.setMarketingChannelLeadsCustomField(APISettings.AmoCRMMarketingChannelLeadsCustomField);
+        incomingCallBusinessProcess.setSourceContactsCustomField(APISettings.AmoCRMSourceContactsCustomField);
+        incomingCallBusinessProcess.setEmailContactCustomField(APISettings.AmoCRMEmailContactCustomField);
+        incomingCallBusinessProcess.setEmailContactEnum(APISettings.AmoCRMEmailContactEnum);
         incomingCallBusinessProcess.setSourceLeadsCustomField(sourceLeadsCustomField());
 
         /*HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
@@ -180,7 +168,7 @@ public class ServiceBeanConfiguration {
     @Bean
     public AddingCallNotesToEmptyLead addingCallNotesToEmptyLead(){
         AddingCallNotesToEmptyLead addingCallNotesToEmptyLead = new AddingCallNotesToEmptyLeadImpl();
-        addingCallNotesToEmptyLead.setPhoneNumberCustomFieldLeads(561026l);
+        addingCallNotesToEmptyLead.setPhoneNumberCustomFieldLeads(APISettings.AmoCRMPhoneNumberCustomFieldLeads);
 
         return addingCallNotesToEmptyLead;
     }
@@ -193,14 +181,25 @@ public class ServiceBeanConfiguration {
     @Bean
     public AmoCRMLeadsFromSiteService amoCRMLeadsFromSiteService(){
         AmoCRMLeadsFromSiteService amoCRMLeadsFromSiteService = new AmoCRMLeadsFromSiteServiceImpl();
-        amoCRMLeadsFromSiteService.setMarketingChannelCustomFieldId(561440l);
-        amoCRMLeadsFromSiteService.setUtmSourceCustomFieldId(568306l);
-        amoCRMLeadsFromSiteService.setUtmMediumCustomFieldId(568308l);
-        amoCRMLeadsFromSiteService.setUtmCampaignCustomFieldId(568310l);
-        amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldId(576380l);
-        amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(1353964l);
-       // amoCRMLeadsFromSiteService.setProjectIdToLeadsSource(projectIdToLeadsSource());
+        amoCRMLeadsFromSiteService.setMarketingChannelCustomFieldId(APISettings.AmoCRMMarketingChannelLeadsCustomField);
+        amoCRMLeadsFromSiteService.setUtmSourceCustomFieldId(APISettings.AmoCRMUtmSourceCustomFieldId);
+        amoCRMLeadsFromSiteService.setUtmMediumCustomFieldId(APISettings.AmoCRMUtmMediumCustomFieldId);
+        amoCRMLeadsFromSiteService.setUtmCampaignCustomFieldId(APISettings.AmoCRMUtmCampaignCustomFieldId);
+        amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldId(APISettings.AmoCRMNewLeadFromSiteStatusCustomFieldId);
+        amoCRMLeadsFromSiteService.setNewLeadFromSiteStatusCustomFieldEnumNotProcessed(APISettings.AmoCRMNewLeadFromSiteStatusCustomFieldEnumNotProcessed);
+        amoCRMLeadsFromSiteService.setDefaultUserID(APISettings.AmoCRMDefaultUserID);
+        amoCRMLeadsFromSiteService.setMarketingChannelContactsCustomField(APISettings.AmoCRMMarketingChannelContactsCustomField);
+        amoCRMLeadsFromSiteService.setMarketingChannelLeadsCustomField(APISettings.AmoCRMMarketingChannelLeadsCustomField);
+        amoCRMLeadsFromSiteService.setPhoneNumberCustomField(APISettings.AmoCRMPhoneNumberCustomField);
+        amoCRMLeadsFromSiteService.setPhoneNumberCustomFieldLeads(APISettings.AmoCRMPhoneNumberCustomFieldLeads);
+        amoCRMLeadsFromSiteService.setEmailContactCustomField(APISettings.AmoCRMEmailContactCustomField);
+        amoCRMLeadsFromSiteService.setSourceContactsCustomField(APISettings.AmoCRMSourceContactsCustomField);
         amoCRMLeadsFromSiteService.setSourceLeadsCustomField(sourceLeadsCustomField());
+        amoCRMLeadsFromSiteService.setEmailContactEnum(APISettings.AmoCRMEmailContactEnum);
+        amoCRMLeadsFromSiteService.setPhoneNumberContactStockField(APISettings.AmoCRMPhoneNumberStockFieldContact);
+        amoCRMLeadsFromSiteService.setPhoneNumberStockFieldContactEnumWork(APISettings.AmoCRMPhoneNumberStockFieldContactEnumWork);
+       // amoCRMLeadsFromSiteService.setProjectIdToLeadsSource(projectIdToLeadsSource());
+
 
         return amoCRMLeadsFromSiteService;
     }
