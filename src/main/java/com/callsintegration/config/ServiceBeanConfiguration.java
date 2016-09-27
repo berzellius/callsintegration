@@ -6,6 +6,7 @@ import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHan
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
 import com.callsintegration.service.*;
 import com.callsintegration.settings.APISettings;
+import com.callsintegration.settings.LocalProjectSettings;
 import com.callsintegration.settings.ProjectSettings;
 import com.callsintegration.settings.RemoteProjectSettings;
 import org.springframework.context.annotation.Bean;
@@ -81,9 +82,9 @@ public class ServiceBeanConfiguration {
     @Bean
     public ProjectSettings projectSettings(){
         // Локальный сервер
-        //return new LocalProjectSettings();
+        return new LocalProjectSettings();
         // Боевой сервер
-        return new RemoteProjectSettings();
+        //return new RemoteProjectSettings();
     }
 
     @Bean
@@ -140,7 +141,6 @@ public class ServiceBeanConfiguration {
     @Bean
     public IncomingCallBusinessProcess incomingCallBusinessProcess(){
         IncomingCallBusinessProcessImpl incomingCallBusinessProcess = new IncomingCallBusinessProcessImpl();
-
         incomingCallBusinessProcess.setDefaultUserId(APISettings.AmoCRMDefaultUserID);
         incomingCallBusinessProcess.setPhoneNumberCustomField(APISettings.AmoCRMPhoneNumberCustomField);
         incomingCallBusinessProcess.setPhoneNumberCustomFieldLeads(APISettings.AmoCRMPhoneNumberCustomFieldLeads);

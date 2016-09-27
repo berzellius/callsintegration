@@ -1,7 +1,9 @@
 package com.callsintegration.web;
 
+import com.callsintegration.dto.site.CallRequest;
 import com.callsintegration.dto.site.LeadRequest;
 import com.callsintegration.dto.site.Result;
+import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.CallsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,5 +33,19 @@ public class RestController extends BaseController {
             LeadRequest leadRequest
     ){
         return callsService.newLeadFromSite(leadRequest.getLeads(), leadRequest.getOrigin(), leadRequest.getPassword());
+    }
+
+    @RequestMapping(
+            value = "call_webhook",
+            method = RequestMethod.POST,
+            consumes="application/json",
+            produces="application/json"
+    )
+    @ResponseBody
+    public Result newCallWebhook(
+            @RequestBody
+            CallRequest callRequest
+    ){
+        return null;
     }
 }

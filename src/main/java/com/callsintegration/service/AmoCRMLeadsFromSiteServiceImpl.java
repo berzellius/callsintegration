@@ -370,6 +370,10 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     }
 
     public HashMap<Integer, Long> getProjectIdToLeadsSource() {
+        if(projectIdToLeadsSource == null){
+            this.setProjectIdToLeadsSource(new HashMap<>());
+        }
+
         if(projectIdToLeadsSource.size() == 0){
             log.debug("updating projectIdToLeadsSource in AmoCRMLeadsFromSiteServiceImpl");
             List<Site> sites = (List<Site>) siteRepository.findAll();

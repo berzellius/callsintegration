@@ -272,11 +272,11 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                         sourceCustomField.getValues().size() == 0
                 ) {
             log.info("'Source' is absent or empty");
+            HashMap<Integer, Long> prToLs = this.getProjectIdToLeadsSource();
             updated = true;
             String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
             amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
         }
-
 
         if (updated) {
             log.info("Lead #".concat(amoCRMLead.getId().toString()).concat(" has been updated"));
@@ -415,8 +415,13 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 */
 
     public HashMap<Integer, Long> getProjectIdToLeadsSource() {
+        if(projectIdToLeadsSource == null){
+            this.setProjectIdToLeadsSource(new HashMap<>());
+        }
+
+
         if(projectIdToLeadsSource.size() == 0){
-            log.debug("updating projectIdToLeadsSource in incomingBusinessProcessImpl");
+            log.info("updating projectIdToLeadsSource in incomingBusinessProcessImpl");
             List<Site> sites = (List<Site>) siteRepository.findAll();
             for(Site site : sites){
                 projectIdToLeadsSource.put(site.getCallTrackingProjectId(), Long.decode(site.getCrmLeadSourceId()));
