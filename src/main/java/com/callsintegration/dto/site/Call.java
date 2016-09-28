@@ -2,6 +2,8 @@ package com.callsintegration.dto.site;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
+
 /**
  * Created by berz on 15.06.2016.
  */
@@ -18,7 +20,7 @@ public class Call {
     private String virtual_number; // Номер, на который звонили
     private String caller; // Номер, с которого звонили
     private String uniqueid; // Уникальный ID
-    private String datetime; // Время
+    private Date datetime; // Время
     private Integer project_id; // ID проекта calltracking
     /*
     *
@@ -59,11 +61,11 @@ public class Call {
         this.uniqueid = uniqueid;
     }
 
-    public String getDatetime() {
+    public Date getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(Date datetime) {
         this.datetime = datetime;
     }
 

@@ -29,4 +29,8 @@ public interface IncomingCallBusinessProcess {
     String getEmailContactEnum();
 
     void setEmailContactEnum(String emailContactEnum);
+
+    void setPhoneNumberContactStockField(Long phoneNumberContactStockField);
+
+    void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork);
 }

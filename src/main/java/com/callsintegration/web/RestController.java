@@ -5,6 +5,7 @@ import com.callsintegration.dto.site.LeadRequest;
 import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.CallsService;
+import com.callsintegration.service.WebhookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,9 @@ public class RestController extends BaseController {
 
     @Autowired
     CallsService callsService;
+
+    @Autowired
+    WebhookService webhookService;
 
     @RequestMapping(
             value = "lead_from_site",
@@ -46,6 +50,6 @@ public class RestController extends BaseController {
             @RequestBody
             CallRequest callRequest
     ){
-        return null;
+        return webhookService.newCallFromWebhook(callRequest);
     }
 }

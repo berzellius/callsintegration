@@ -4,6 +4,8 @@ package com.callsintegration.config;
 import com.callsintegration.dto.api.ErrorHandlers.AmoCRMAPIRequestErrorHandler;
 import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHandler;
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
+import com.callsintegration.scheduling.ScheduledTasks;
+import com.callsintegration.scheduling.ScheduledTasksImpl;
 import com.callsintegration.service.*;
 import com.callsintegration.settings.APISettings;
 import com.callsintegration.settings.LocalProjectSettings;
@@ -36,6 +38,11 @@ public class ServiceBeanConfiguration {
 
         return projectIdToLeadsSource;
     }*/
+
+    @Bean
+    public ScheduledTasks scheduledTasks(){
+        return new ScheduledTasksImpl();
+    }
 
     Long sourceLeadsCustomField(){
         return APISettings.AmoCRMSourceLeadsCustomField;
@@ -149,6 +156,8 @@ public class ServiceBeanConfiguration {
         incomingCallBusinessProcess.setSourceContactsCustomField(APISettings.AmoCRMSourceContactsCustomField);
         incomingCallBusinessProcess.setEmailContactCustomField(APISettings.AmoCRMEmailContactCustomField);
         incomingCallBusinessProcess.setEmailContactEnum(APISettings.AmoCRMEmailContactEnum);
+        incomingCallBusinessProcess.setPhoneNumberContactStockField(APISettings.AmoCRMPhoneNumberStockFieldContact);
+        incomingCallBusinessProcess.setPhoneNumberStockFieldContactEnumWork(APISettings.AmoCRMPhoneNumberStockFieldContactEnumWork);
         incomingCallBusinessProcess.setSourceLeadsCustomField(sourceLeadsCustomField());
 
         /*HashMap<Integer, Long> projectIdToContactsSource = new HashMap<>();
@@ -203,4 +212,10 @@ public class ServiceBeanConfiguration {
 
         return amoCRMLeadsFromSiteService;
     }
+
+    @Bean
+    WebhookService webhookService(){
+        return new WebhookServiceImpl();
+    }
+
 }

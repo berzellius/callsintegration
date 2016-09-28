@@ -44,51 +44,19 @@ public class SchedulerImpl implements MainScheduler {
     @Autowired
     CallTrackingAPIService callTrackingAPIService;
 
+    @Autowired
+    ScheduledTasks scheduledTasks;
 
     @Scheduled(fixedDelay = 120000)
     @Override
     public void newLeadsFromSiteToCRM(){
-        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-        jobParametersBuilder.addDate("start", new Date());
-
-
-        try {
-            callTrackingAPIService.updateMarketingChannelsFromCalltracking();
-
-            jobLauncher.run(newLeadsFromSiteToCRMJob, jobParametersBuilder.toJobParameters());
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            e.printStackTrace();
-        } catch (APIAuthException e) {
-            e.printStackTrace();
-        }
+        scheduledTasks.newLeadsFromSiteToCRM();
     }
 
 
 
     public void runCallsImport(){
-
-        JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-        jobParametersBuilder.addDate("start", new Date());
-
-        System.out.println("START calls import job!");
-
-        try {
-            jobLauncher.run(callsImportJob, jobParametersBuilder.toJobParameters());
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            e.printStackTrace();
-        }
+        scheduledTasks.runCallsImport();
     }
 
     public int hourOfDay(){
@@ -144,7 +112,7 @@ public class SchedulerImpl implements MainScheduler {
     *
     * 60 сек
      */
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 120000)
     @Override
     public void callsToCRM(){
         //int hour = hourOfDay();
@@ -188,24 +156,7 @@ public class SchedulerImpl implements MainScheduler {
     }
 
     private void runImportCallsToCRM(){
-
-
-        try {
-
-            JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
-            jobParametersBuilder.addDate("start", new Date());
-            jobLauncher.run(newCallsToCRMJob, jobParametersBuilder.toJobParameters());
-
-            System.out.println("START calls to CRM job!");
-        } catch (JobExecutionAlreadyRunningException e) {
-            e.printStackTrace();
-        } catch (JobRestartException e) {
-            e.printStackTrace();
-        } catch (JobInstanceAlreadyCompleteException e) {
-            e.printStackTrace();
-        } catch (JobParametersInvalidException e) {
-            e.printStackTrace();
-        }
+        scheduledTasks.runImportCallsToCRM();
     }
 
 

@@ -2,11 +2,14 @@ package com.callsintegration.service;
 
 import com.callsintegration.dmodel.LeadFromSite;
 import com.callsintegration.dmodel.Site;
+import com.callsintegration.dto.site.Call;
+import com.callsintegration.dto.site.CallRequest;
 import com.callsintegration.dto.site.Lead;
 import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.repository.LeadFromSiteRepository;
 import com.callsintegration.repository.SiteRepository;
+import com.callsintegration.scheduling.ScheduledTasks;
 import com.callsintegration.specifications.CallSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specifications;
@@ -37,6 +40,9 @@ public class CallsServiceImpl implements CallsService {
 
     @Autowired
     LeadFromSiteRepository leadFromSiteRepository;
+
+   // @Autowired
+    //ScheduledTasks scheduledTasks;
 
     @Override
     public Long callsAlreadyLoaded() {
@@ -80,4 +86,6 @@ public class CallsServiceImpl implements CallsService {
         leadFromSiteRepository.save(leadFromSiteList);
         return new Result("success");
     }
+
+
 }

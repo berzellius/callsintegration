@@ -3,6 +3,7 @@ package com.callsintegration.service;
 import com.callsintegration.dmodel.Call;
 import com.callsintegration.dmodel.Site;
 import com.callsintegration.dto.api.amocrm.*;
+import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedContactsResponse;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedLeadsResponse;
 import com.callsintegration.exception.APIAuthException;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.swing.*;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -49,6 +51,14 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     private Long phoneNumberCustomField;
     private Long phoneNumberCustomFieldLeads;
 
+    /*
+    *
+    * ID поля "телефон" и enum "Рабочий"
+     */
+    private Long phoneNumberContactStockField;
+
+    private String phoneNumberStockFieldContactEnumWork;
+
     /**
      * Id поля "email" для контактов и сделок
      */
@@ -70,7 +80,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     /*
      * Привязки {id проекта calltracking}=>{enum значение поля "Источник"}
      */
-    //private HashMap<Integer, Long> projectIdToContactsSource;
+    private HashMap<Integer, Long> projectIdToContactsSource;
     private HashMap<Integer, Long> projectIdToLeadsSource;
 
     @Override
@@ -88,22 +98,17 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     }
 
     private void processCall(Call call) throws APIAuthException {
+        AmoCRMContact contact = null;
+
         String number = call.getNumber();
         List<AmoCRMContact> amoCRMContacts = amoCRMService.getContactsByQuery(number);
 
         if (amoCRMContacts.size() == 0) {
-            log.info("Not found contacts for number " + number);
-
-            /**
-             * Удалено 02.12.2015 - теперь создавать отсутствующий контакт не надо.
-             * Создание контактов осуществляет сторонний сервис
-             */
-            /*createContact(call);
-            processCall(call);*/
+            log.info("Not found contacts for number " + number + "; creating new");
+            contact = createContact(call);
         } else {
-            log.info("Contacts found for number " + number);
+            log.info("Contacts found for number " + number + ": " + amoCRMContacts.size());
 
-            AmoCRMContact contact = null;
             for (AmoCRMContact amoCRMContact : amoCRMContacts) {
                 if (amoCRMContact.getCustom_fields() == null)
                     continue;
@@ -128,14 +133,14 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                     }
                 }
             }
+        }
 
-            if (contact == null) {
-                log.info("All found contacts for number " + number + " is wrong");
-                throw new IllegalStateException("All found contacts for number " + number + " is wrong");
-            } else {
-                log.info("Got contact #" + contact.getId().toString() + " for number " + number + "!");
-                this.workWithContact(contact, call);
-            }
+        if (contact == null) {
+            log.info("All found contacts for number " + number + " is wrong");
+            throw new IllegalStateException("All found contacts for number " + number + " is wrong");
+        } else {
+            log.info("Got contact #" + contact.getId().toString() + " for number " + number + "!");
+            this.workWithContact(contact, call);
         }
     }
 
@@ -144,6 +149,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         ArrayList<Long> leadIds = contact.getLinked_leads_id();
 
         log.info("Work with contact #" + contact.getId());
+        checkExistingContactCustomFields(contact, call);
 
         Integer foundOpenedLeads = 0;
         if (leadIds != null && leadIds.size() != 0) {
@@ -228,6 +234,83 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         amoCRMService.addTask(amoCRMTask);
     }
 
+    private void checkExistingContactCustomFields(AmoCRMContact contact, Call call) throws APIAuthException {
+        log.info("checking custom fileds for contact #".concat(contact.getId().toString()));
+
+        ArrayList<AmoCRMCustomField> crmCustomFields = contact.getCustom_fields();
+        Boolean updated = false;
+
+        if(crmCustomFields == null){
+            crmCustomFields = new ArrayList<>();
+        }
+
+        AmoCRMCustomField marketingChannelCustomField = null;
+        AmoCRMCustomField sourceCustomField = null;
+
+        for (AmoCRMCustomField amoCRMCustomField : crmCustomFields) {
+
+            if (amoCRMCustomField.getId().equals(this.getMarketingChannelContactsCustomField())) {
+                // Кастомное поле "Рекламный канал"
+                marketingChannelCustomField = amoCRMCustomField;
+            }
+
+            if (amoCRMCustomField.getId().equals(this.getSourceContactsCustomField())) {
+                // Кастомное поле "Источник"
+                sourceCustomField = amoCRMCustomField;
+            }
+        }
+
+        if (
+                marketingChannelCustomField == null ||
+                        marketingChannelCustomField.getValues() == null ||
+                        marketingChannelCustomField.getValues().size() == 0
+                ) {
+            log.info("'Marketing Channel' is absent or empty");
+            if(call.getSource() != null) {
+                updated = true;
+                String[] sourceField = {call.getSource()};
+                contact.addStringValuesToCustomField(this.getMarketingChannelContactsCustomField(), sourceField);
+            }
+            else{
+                log.info("to be honest, sourceField is empty in Call entity too. This is the life");
+            }
+        }
+
+        if (
+                sourceCustomField == null ||
+                        sourceCustomField.getValues() == null ||
+                        sourceCustomField.getValues().size() == 0
+                ) {
+            log.info("'Source' is absent or empty");
+
+            if(call.getProjectId() != null && this.getProjectIdToContactsSource().get(call.getProjectId()) != null) {
+                updated = true;
+                String[] projectField = {this.getProjectIdToContactsSource().get(call.getProjectId()).toString()};
+                contact.addStringValuesToCustomField(this.getSourceContactsCustomField(), projectField);
+            }
+            else{
+                log.info("to be honest, projectID is empty in Call entity too or this project not properly registered. This is the life");
+            }
+        }
+
+        if (updated) {
+            log.info("Contact #".concat(contact.getId().toString()).concat(" has been updated"));
+
+            AmoCRMEntities amoCRMEntities = new AmoCRMEntities();
+            ArrayList<AmoCRMContact> amoCRMContacts = new ArrayList<>();
+            amoCRMContacts.add(contact);
+            amoCRMEntities.setUpdate(amoCRMContacts);
+            AmoCRMCreatedContactsResponse response = amoCRMService.editContacts(amoCRMEntities);
+            if (response == null) {
+                throw new IllegalStateException("No response, but we have not any error message from AmoCRM API!");
+            }
+
+            log.info("updating contact resonse: " + response.getResponse().toString());
+        }
+
+    }
+
+
     private void checkExistingLeadCustomFields(AmoCRMLead amoCRMLead, Call call) throws APIAuthException {
 
         log.info("checking custom fields for lead #".concat(amoCRMLead.getId().toString()));
@@ -261,9 +344,14 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                         marketingChannelCustomField.getValues().size() == 0
                 ) {
             log.info("'Marketing Channel' is absent or empty");
-            updated = true;
-            String[] sourceField = {call.getSource()};
-            amoCRMLead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), sourceField);
+            if(call.getSource() != null) {
+                updated = true;
+                String[] sourceField = {call.getSource()};
+                amoCRMLead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), sourceField);
+            }
+            else{
+                log.info("to be honest, sourceField is empty in Call entity too. This is the life");
+            }
         }
 
         if (
@@ -272,10 +360,15 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
                         sourceCustomField.getValues().size() == 0
                 ) {
             log.info("'Source' is absent or empty");
-            HashMap<Integer, Long> prToLs = this.getProjectIdToLeadsSource();
-            updated = true;
-            String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
-            amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
+
+            if(call.getProjectId() != null && this.getProjectIdToLeadsSource().get(call.getProjectId()) != null) {
+                updated = true;
+                String[] projectField = {this.getProjectIdToLeadsSource().get(call.getProjectId()).toString()};
+                amoCRMLead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), projectField);
+            }
+            else{
+                log.info("to be honest, projectID is empty in Call entity too or this project not properly registered. This is the life");
+            }
         }
 
         if (updated) {
@@ -325,21 +418,29 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         return amoCRMLead1;
     }
 
-    /*private void createContact(Call call) throws APIAuthException {
+    private AmoCRMContact createContact(Call call) throws APIAuthException {
         String number = call.getNumber();
 
         AmoCRMContact amoCRMContact = new AmoCRMContact();
         amoCRMContact.setName("CallTracking:[" + number + "]");
         amoCRMContact.setResponsible_user_id(this.getDefaultUserId());
         String[] fieldNumber = {number};
-        amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberCustomFieldLeads(), fieldNumber);
+        String[] extFieldNumber = {"7" + number};
+        amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberCustomField(), fieldNumber);
+        amoCRMContact.addStringValuesToCustomField(this.getPhoneNumberContactStockField(), extFieldNumber, this.getPhoneNumberStockFieldContactEnumWork());
         String[] fieldSource = {call.getSource()};
         amoCRMContact.addStringValuesToCustomField(this.getMarketingChannelContactsCustomField(), fieldSource);
         String[] fieldProject = {this.getProjectIdToContactsSource().get(call.getProjectId()).toString()};
         amoCRMContact.addStringValuesToCustomField(this.getSourceContactsCustomField(), fieldProject);
 
-        amoCRMService.addContact(amoCRMContact);
-    }*/
+        AmoCRMCreatedEntityResponse resp = amoCRMService.addContact(amoCRMContact);
+        if(resp.getId() == null){
+            throw new IllegalStateException("Request to create contact was sent but no `id created` returned");
+        }
+        AmoCRMContact contact = amoCRMService.getContactById(resp.getId());
+        return contact;
+    }
+
 
     @Override
     public Long getPhoneNumberCustomField() {
@@ -430,6 +531,22 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         return projectIdToLeadsSource;
     }
 
+    public HashMap<Integer, Long> getProjectIdToContactsSource() {
+        if(projectIdToContactsSource == null){
+            this.setProjectIdToContactsSource(new HashMap<>());
+        }
+
+        if(projectIdToContactsSource.size() == 0){
+            log.info("updating projectIdToContactsSource in incomingBusinessProcessImpl");
+            List<Site> sites = (List<Site>) siteRepository.findAll();
+            for(Site site : sites){
+                projectIdToContactsSource.put(site.getCallTrackingProjectId(), Long.decode(site.getCrmContactSourceId()));
+            }
+        }
+
+        return projectIdToContactsSource;
+    }
+
     public void setProjectIdToLeadsSource(HashMap<Integer, Long> projectIdToLeadsSource) {
         this.projectIdToLeadsSource = projectIdToLeadsSource;
     }
@@ -452,4 +569,28 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     public void setEmailContactEnum(String emailContactEnum) {
         this.emailContactEnum = emailContactEnum;
     }
+
+
+    public void setProjectIdToContactsSource(HashMap<Integer, Long> projectIdToContactsSource) {
+        this.projectIdToContactsSource = projectIdToContactsSource;
+    }
+
+    public Long getPhoneNumberContactStockField() {
+        return phoneNumberContactStockField;
+    }
+
+    @Override
+    public void setPhoneNumberContactStockField(Long phoneNumberContactStockField) {
+        this.phoneNumberContactStockField = phoneNumberContactStockField;
+    }
+
+    public String getPhoneNumberStockFieldContactEnumWork() {
+        return phoneNumberStockFieldContactEnumWork;
+    }
+
+    @Override
+    public void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork) {
+        this.phoneNumberStockFieldContactEnumWork = phoneNumberStockFieldContactEnumWork;
+    }
+
 }
