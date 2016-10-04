@@ -24,6 +24,9 @@ public class WebhookServiceImpl implements WebhookService {
     @Autowired
     ScheduledTasks scheduledTasks;
 
+    @Autowired
+    CallTrackingAPIService callTrackingAPIService;
+
 
     /*
     *
@@ -45,12 +48,16 @@ public class WebhookServiceImpl implements WebhookService {
     @Transactional
     private void processCalls(List<Call> calls){
         for(Call call : calls){
+            if(call.getCaller() == null || call.getCaller().equals("")){
+                call.setCaller("unknown");
+            }
             com.callsintegration.dmodel.Call c = new com.callsintegration.dmodel.Call();
             c.setNumber(call.getCaller());
             c.setDt(call.getDatetime());
             c.setProjectId(call.getProject_id());
             c.setState(com.callsintegration.dmodel.Call.State.NEW);
 
+            callTrackingAPIService.processCallOnImport(c);
             callRepository.save(c);
         }
     }

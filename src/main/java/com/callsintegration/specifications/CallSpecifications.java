@@ -57,4 +57,14 @@ public class CallSpecifications {
             }
         };
     }
+
+    public static Specification<Call> byStatusNotNull(){
+        return new Specification<Call>() {
+            @Override
+            public Predicate toPredicate(Root<Call> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+                Predicate statusNotNull = criteriaBuilder.isNotNull(root.get("status"));
+                return statusNotNull;
+            }
+        };
+    }
 }

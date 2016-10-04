@@ -29,6 +29,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -59,6 +60,33 @@ public class CallsImportBatchConfiguration {
         // Внимание: один шаг чтения должен сопровождаться одним шагом записи в БД. иначе будут засасываться повторяющиеся данные.
         CallTrackingCallsReader reader = new CallTrackingCallsReader(new Date(), new Date(), 100, CallTrackingCallsReader.DateMode.UPDATE_EACH_READ);
         return reader;
+    }
+
+    @Bean
+    public ItemReader<List<Call>> callsReaderCustom() throws ParseException {
+        Calendar c1 = Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
+        c1.set(Calendar.YEAR, 2016);
+        c1.set(Calendar.MONTH, Calendar.OCTOBER);
+        c1.set(Calendar.DAY_OF_MONTH, c1.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c1.set(Calendar.HOUR_OF_DAY, 0);
+        c1.set(Calendar.MINUTE, 0);
+        c1.set(Calendar.SECOND, 0);
+
+        c2.set(Calendar.YEAR, 2016);
+        c2.set(Calendar.MONTH, Calendar.OCTOBER);
+        c2.set(Calendar.DAY_OF_MONTH, 3);
+        c2.set(Calendar.HOUR_OF_DAY, 23);
+        c2.set(Calendar.MINUTE, 59);
+        c2.set(Calendar.SECOND, 59);
+
+
+        Date dt1 = c1.getTime();
+        Date dt2 = c2.getTime();
+        System.out.println("f: " + dt1 + ", t: " + dt2);
+
+        CallTrackingCallsReader readerCustom = new CallTrackingCallsReader(dt1, dt2, 100, CallTrackingCallsReader.DateMode.NO_UPDATE);
+        return readerCustom;
     }
 
     @Bean
@@ -102,6 +130,7 @@ public class CallsImportBatchConfiguration {
        return stepBuilderFactory.get("callsImportStep")
                // представляется верным, что chunk size - это эквивалент commit interval
                 .<List<Call>, List<Call>>chunk(1)
+               // .reader(callsReader)
                 .reader(callsReader)
                 .processor(itemProcessor)
                 .writer(writer)

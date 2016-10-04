@@ -38,6 +38,9 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     @Autowired
     SiteRepository siteRepository;
 
+    private static final boolean CREATE_TASK_FOR_EACH_CALL = true;
+    private static final boolean CREATE_LEAD_IF_ABSENT = true;
+
     private static final Logger log = LoggerFactory.getLogger(IncomingCallBusinessProcessImpl.class);
 
     /*
@@ -172,7 +175,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         }
 
         // Не найдено сделок
-        if (foundOpenedLeads == 0) {
+        if (foundOpenedLeads == 0 && CREATE_LEAD_IF_ABSENT) {
             log.info("We need to create lead for contact #" + contact.getId());
             AmoCRMLead amoCRMLeadToWorkWith = this.createLeadForContact(contact, call);
         }
@@ -222,16 +225,18 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     }
 
     private void createTasksForCall(AmoCRMContact contact, Call call) throws APIAuthException {
-        AmoCRMTask amoCRMTask = new AmoCRMTask();
-        amoCRMTask.setResponsible_user_id(getDefaultUserId());
-        amoCRMTask.setContact(contact);
+        if(CREATE_TASK_FOR_EACH_CALL) {
+            AmoCRMTask amoCRMTask = new AmoCRMTask();
+            amoCRMTask.setResponsible_user_id(getDefaultUserId());
+            amoCRMTask.setContact(contact);
 
-        // Связаться с клиентом
-        amoCRMTask.setTask_type(1l);
-        amoCRMTask.setText("Повторный звонок от клиента!");
-        amoCRMTask.setComplete_till(new Date());
+            // Связаться с клиентом
+            amoCRMTask.setTask_type(1l);
+            amoCRMTask.setText("Повторный звонок от клиента!");
+            amoCRMTask.setComplete_till(new Date());
 
-        amoCRMService.addTask(amoCRMTask);
+            amoCRMService.addTask(amoCRMTask);
+        }
     }
 
     private void checkExistingContactCustomFields(AmoCRMContact contact, Call call) throws APIAuthException {
@@ -388,6 +393,7 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
     }
 
     private AmoCRMLead createLeadForContact(AmoCRMContact contact, Call call) throws APIAuthException {
+
         String number = call.getNumber();
         AmoCRMLead amoCRMLead = new AmoCRMLead();
         amoCRMLead.setName("Автоматически -> " + contact.getName());

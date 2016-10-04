@@ -17,6 +17,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -51,6 +53,8 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     @Autowired
     CallTrackingSourceConditionService callTrackingSourceConditionService;
+
+    private static final Logger log = LoggerFactory.getLogger(CallTrackingAPIServiceImpl.class);
 
     private String auth;
     private Integer[] projects = {};
@@ -544,6 +548,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
     @Override
     public void processCallOnImport(Call call) {
+        log.info("processing call on import..");
         call.setDtmCreate(new Date());
 
         if(call.getNumber() != null){

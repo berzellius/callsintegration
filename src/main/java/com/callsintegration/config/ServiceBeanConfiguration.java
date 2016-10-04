@@ -89,9 +89,9 @@ public class ServiceBeanConfiguration {
     @Bean
     public ProjectSettings projectSettings(){
         // Локальный сервер
-        return new LocalProjectSettings();
+        //return new LocalProjectSettings();
         // Боевой сервер
-        //return new RemoteProjectSettings();
+        return new RemoteProjectSettings();
     }
 
     @Bean

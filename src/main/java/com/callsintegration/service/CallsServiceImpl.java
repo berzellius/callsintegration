@@ -59,6 +59,7 @@ public class CallsServiceImpl implements CallsService {
         Long count = callRepository.count(
                 Specifications.where(CallSpecifications.byDates((from != null)? from : new Date(), (to != null)? to : new Date()))
                         .and(CallSpecifications.byProjectId(project))
+                        .and(CallSpecifications.byStatusNotNull())
         );
         return count;
     }

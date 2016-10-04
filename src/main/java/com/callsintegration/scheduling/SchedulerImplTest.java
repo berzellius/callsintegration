@@ -19,7 +19,7 @@ import java.util.Date;
 /**
  * Created by berz on 22.06.2016.
  */
-/*@Component*/
+//@Component
 public class SchedulerImplTest implements MainScheduler {
 
     @Autowired
@@ -43,7 +43,7 @@ public class SchedulerImplTest implements MainScheduler {
     @Autowired
     CallTrackingAPIService callTrackingAPIService;
 
-    @Scheduled(fixedDelay = 30000)
+    //@Scheduled(fixedDelay = 30000)
     @Override
     public void newLeadsFromSiteToCRM(){
         /*JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
@@ -63,7 +63,7 @@ public class SchedulerImplTest implements MainScheduler {
         }*/
     }
 
-    @Scheduled(fixedDelay = 30000)
+    //@Scheduled(fixedDelay = 30000)
     @Override
     public void callsImportProcess() {
         runCallsImport();
