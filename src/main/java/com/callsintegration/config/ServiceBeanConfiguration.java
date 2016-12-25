@@ -207,6 +207,8 @@ public class ServiceBeanConfiguration {
         amoCRMLeadsFromSiteService.setEmailContactEnum(APISettings.AmoCRMEmailContactEnum);
         amoCRMLeadsFromSiteService.setPhoneNumberContactStockField(APISettings.AmoCRMPhoneNumberStockFieldContact);
         amoCRMLeadsFromSiteService.setPhoneNumberStockFieldContactEnumWork(APISettings.AmoCRMPhoneNumberStockFieldContactEnumWork);
+        amoCRMLeadsFromSiteService.setCommentCustomField(APISettings.AMOCRMLeadCommentField);
+        amoCRMLeadsFromSiteService.setLeadFromSiteTagId(APISettings.AMOCRMLeadFromSiteTagId);
        // amoCRMLeadsFromSiteService.setProjectIdToLeadsSource(projectIdToLeadsSource());
 
 

@@ -9,41 +9,66 @@ public class APISettings {
     *
     * AmoCRM
      */
-    public static String AmoCRMUser = "elektro-karniz@yandex.ru";
-    public static String AmoCRMHash = "ca70636c49a9e1d747022e47d546d2ab";
-    public static String AmoCRMLoginUrl = "https://elektrokarniz.amocrm.ru/private/api/auth.php?type=json";
-    public static String AmoCRMApiBaseUrl = "https://elektrokarniz.amocrm.ru/private/api/v2/json/";
+    public static String AmoCRMUser = "tsvetkov.ir@yandex.ru";
+    public static String AmoCRMHash = "f23f18376f4b9652830f72e981268be4";
+    public static String AmoCRMLoginUrl = "https://elkarniz.amocrm.ru/private/api/auth.php?type=json";
+    public static String AmoCRMApiBaseUrl = "https://elkarniz.amocrm.ru/private/api/v2/json/";
 
     public static Long[] AmoCRMLeadClosedStatuses = {142l, 143l};
     public static int AmoCRMMaxRelogins = 5;
-    public static Long AmoCRMDefaultUserID = 543159l;
-    public static Long AmoCRMPhoneNumberCustomField = 561024l;
-    public static Long AmoCRMPhoneNumberCustomFieldLeads = 561026l;
-    public static Long AmoCRMPhoneNumberStockFieldContact = 459342l;
-    public static String AmoCRMPhoneNumberStockFieldContactEnumWork = "1084660";
-    public static Long AmoCRMMarketingChannelContactsCustomField = 561442l;
-    public static Long AmoCRMMarketingChannelLeadsCustomField = 561440l;
-    public static Long AmoCRMSourceContactsCustomField = 561446l;
-    public static Long AmoCRMEmailContactCustomField = 459344l;
-    public static Long AmoCRMSourceLeadsCustomField = 561444l;
-    public static String AmoCRMEmailContactEnum = "1084672";
+    // Пользователь по умолчанию
+    public static Long AmoCRMDefaultUserID = 1110783l;
+    // Кастомное поле "номер телефона" для контакта
+    public static Long AmoCRMPhoneNumberCustomField = 1399410l;
+    // Кастомное поле "номер телефона" для сделки
+    public static Long AmoCRMPhoneNumberCustomFieldLeads = 1399360l;
+    // Встроенное поле "номер телефона для контакта"
+    public static Long AmoCRMPhoneNumberStockFieldContact = 1369748l;
+    // enum значение "Рабочий" для встроенного поля "номер телефона"
+    public static String AmoCRMPhoneNumberStockFieldContactEnumWork = "3282364";
+    // кастомное поле "Рекламный канал" для контакта
+    public static Long AmoCRMMarketingChannelContactsCustomField = 1399424l;
+    // кастомное поле "Рекламный канал" для сделки
+    public static Long AmoCRMMarketingChannelLeadsCustomField = 1399398l;
+    // кастомное поле "Источник" (сайт) для контакта
+    public static Long AmoCRMSourceContactsCustomField = 1399786l;
+    // встроенное поле "email" для контакта
+    public static Long AmoCRMEmailContactCustomField = 1369750l;
+    // кастомное поле "Источник" (сайт) для сделки
+    public static Long AmoCRMSourceLeadsCustomField = 1399784l;
+    // кастомное поле "Комментарий" для сделки
+    public static Long AMOCRMLeadCommentField = 1399400l;
+    // enum значение "email" для контакта
+    public static String AmoCRMEmailContactEnum = "3282376";
+    // кастомное поле "utm_source"
+    // todo
     public static Long AmoCRMUtmSourceCustomFieldId = 568306l;
+    // кастомное поле "utm_medium"
+    // todo
     public static Long AmoCRMUtmMediumCustomFieldId = 568308l;
+    // кастомное поле "utm_campaign"
+    // todo
     public static Long AmoCRMUtmCampaignCustomFieldId = 568310l;
+
+    // Тег "заявка с сайта"
+    public static Long AMOCRMLeadFromSiteTagId = 98794l;
+
+    // todo - разобраться, нужны ли все еще эти поля
     public static Long AmoCRMNewLeadFromSiteStatusCustomFieldId = 576380l;
     public static Long AmoCRMNewLeadFromSiteStatusCustomFieldEnumNotProcessed = 1353964l;
 
     /*
     *
     * Calltracking
-     */
-    public static String CallTrackingLogin = "info@home-motion.ru";
-    public static String CallTrackingPassword = "SsX0d1XE75";
-    public static String CallTrackingWebLogin = "info@home-motion.ru";
-    public static String CallTrackingWebPassword = "SsX0d1XE75";
+    */
+    public static String CallTrackingLogin = "timonina@elektro-karniz.ru";
+    public static String CallTrackingPassword = "CiMaa438569ERi";
+    public static String CallTrackingWebLogin = "timonina@elektro-karniz.ru";
+    public static String CallTrackingWebPassword = "CiMaa438569ERi";
     public static String CallTrackingLoginUrl = "https://calltracking.ru/admin/login";
     public static String CallTrackingAPIUrl = "https://calltracking.ru/api/get_data.php";
     public static String CallTrackingAPILoginUrl = "https://calltracking.ru/api/login.php";
 
-    public static Integer[] CallTrackingProjects = {3901, 3400, 4318, 4319, 4590, 4539};
+    public static Integer[] CallTrackingProjects = {4803, 4837, 4831};
+
 }

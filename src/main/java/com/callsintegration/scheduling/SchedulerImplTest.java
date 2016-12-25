@@ -80,7 +80,7 @@ public class SchedulerImplTest implements MainScheduler {
     }
 
     @Override
-    @Scheduled(fixedDelay = 30000)
+    //@Scheduled(fixedDelay = 30000)
     public void callsToCRM() {
         runImportCallsToCRM();
     }
@@ -111,12 +111,13 @@ public class SchedulerImplTest implements MainScheduler {
         }
     }
 
+    //@Scheduled(fixedDelay = 10000)
     public void runCallsImport(){
 
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();
         jobParametersBuilder.addDate("start", new Date());
 
-        System.out.println("START calls import job!");
+        System.out.println("START calls import job! (from TEST!)");
 
         try {
             jobLauncher.run(callsImportJob, jobParametersBuilder.toJobParameters());

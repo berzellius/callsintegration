@@ -51,4 +51,8 @@ public interface AmoCRMLeadsFromSiteService {
     void setPhoneNumberContactStockField(Long amoCRMPhoneNumberStockFieldContact);
 
     void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork);
+
+    void setCommentCustomField(Long commentCustomField);
+
+    void setLeadFromSiteTagId(Long leadFromSiteTagId);
 }

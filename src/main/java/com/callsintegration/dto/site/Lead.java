@@ -2,11 +2,13 @@ package com.callsintegration.dto.site;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 /**
  * Created by berz on 15.06.2016.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Lead {
+public class Lead implements Serializable {
 
     public Lead() {
     }

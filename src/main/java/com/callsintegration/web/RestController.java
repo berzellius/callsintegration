@@ -6,6 +6,7 @@ import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.CallsService;
 import com.callsintegration.service.WebhookService;
+import javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +50,9 @@ public class RestController extends BaseController {
     public Result newCallWebhook(
             @RequestBody
             CallRequest callRequest
-    ){
-        return webhookService.newCallFromWebhook(callRequest);
+    ) throws NotFoundException {
+        System.out.println("webhook! " + callRequest.toString());
+        throw new NotFoundException("out of service!");
+        //return webhookService.newCallFromWebhook(callRequest);
     }
 }

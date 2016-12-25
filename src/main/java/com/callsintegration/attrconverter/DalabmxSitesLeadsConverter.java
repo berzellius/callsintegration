@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.AttributeConverter;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Created by berz on 15.06.2016.

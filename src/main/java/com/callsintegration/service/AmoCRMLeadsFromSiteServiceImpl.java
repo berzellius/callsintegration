@@ -35,6 +35,7 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     private Long phoneNumberCustomFieldLeads;
     private Long phoneNumberCustomField;
+    private Long commentCustomField;
     private Long defaultUserID;
     private Long marketingChannelContactsCustomField;
     private Long marketingChannelLeadsCustomField;
@@ -42,6 +43,8 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     private String emailContactEnum;
     private Long phoneNumberContactStockField;
     private String phoneNumberStockFieldContactEnumWork;
+
+    private Long leadFromSiteTagId;
 
 
     private Long sourceLeadsCustomField;
@@ -207,13 +210,19 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
             lead.addStringValuesToCustomField(this.getPhoneNumberCustomFieldLeads(), numberField);
         }
 
+        if(leadFromSite.getLead().getComment() != null){
+            String[] commentField = {leadFromSite.getLead().getComment()};
+            lead.addStringValuesToCustomField(this.getCommentCustomField(), commentField);
+        }
+
         String[] fieldProject = {leadFromSite.getSite().getCrmLeadSourceId()};
         lead.addStringValuesToCustomField(this.getSourceLeadsCustomField(), fieldProject);
 
         String[] fieldSource = {sourceName};
         lead.addStringValuesToCustomField(this.getMarketingChannelLeadsCustomField(), fieldSource);
 
-        lead.tag(193659l, "Заявка с сайта");
+
+        lead.tag(this.getLeadFromSiteTagId(), "Заявка с сайта");
 
         log.info("creating lead for leadFromSite..");
 
@@ -504,5 +513,23 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
     @Override
     public void setPhoneNumberStockFieldContactEnumWork(String phoneNumberStockFieldContactEnumWork) {
         this.phoneNumberStockFieldContactEnumWork = phoneNumberStockFieldContactEnumWork;
+    }
+
+    public Long getCommentCustomField() {
+        return commentCustomField;
+    }
+
+    @Override
+    public void setCommentCustomField(Long commentCustomField) {
+        this.commentCustomField = commentCustomField;
+    }
+
+    public Long getLeadFromSiteTagId() {
+        return leadFromSiteTagId;
+    }
+
+    @Override
+    public void setLeadFromSiteTagId(Long leadFromSiteTagId) {
+        this.leadFromSiteTagId = leadFromSiteTagId;
     }
 }

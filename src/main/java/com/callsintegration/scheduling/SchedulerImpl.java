@@ -129,8 +129,8 @@ public class SchedulerImpl implements MainScheduler {
 
         int hour = hourOfDay();
 
-        //if((hour >= 3 && hour <= 4) || (hour >= 22 && hour <= 23))
-        //runNewAmoCRMLeadsFromSiteProcessing();
+        if((hour >= 3 && hour <= 4) || (hour >= 22 && hour <= 23))
+        runNewAmoCRMLeadsFromSiteProcessing();
     }
 
     private void runNewAmoCRMLeadsFromSiteProcessing(){

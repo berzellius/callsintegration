@@ -384,6 +384,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
         for(Integer project : this.projects){
             Long startIndex = callsService.callsAlreadyLoaded(project, from, to);
+            log.info("for project #" + project + " we have " + startIndex + " records");
             MultiValueMap<String, String> params = apiParams(from, to, startIndex, maxResults);
             params.add("project", project.toString());
 

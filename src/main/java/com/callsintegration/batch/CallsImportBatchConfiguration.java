@@ -68,14 +68,14 @@ public class CallsImportBatchConfiguration {
         Calendar c2 = Calendar.getInstance();
         c1.set(Calendar.YEAR, 2016);
         c1.set(Calendar.MONTH, Calendar.OCTOBER);
-        c1.set(Calendar.DAY_OF_MONTH, c1.getActualMinimum(Calendar.DAY_OF_MONTH));
+        c1.set(Calendar.DAY_OF_MONTH, 7);
         c1.set(Calendar.HOUR_OF_DAY, 0);
         c1.set(Calendar.MINUTE, 0);
         c1.set(Calendar.SECOND, 0);
 
         c2.set(Calendar.YEAR, 2016);
         c2.set(Calendar.MONTH, Calendar.OCTOBER);
-        c2.set(Calendar.DAY_OF_MONTH, 3);
+        c2.set(Calendar.DAY_OF_MONTH, 14);
         c2.set(Calendar.HOUR_OF_DAY, 23);
         c2.set(Calendar.MINUTE, 59);
         c2.set(Calendar.SECOND, 59);
@@ -124,13 +124,14 @@ public class CallsImportBatchConfiguration {
     public Step callsImportStep(
             StepBuilderFactory stepBuilderFactory,
             ItemReader<List<Call>> callsReader,
+            ItemReader<List<Call>> callsReaderCustom,
             ItemProcessor<List<Call>, List<Call>> itemProcessor,
             ItemWriter<List<Call>> writer
     ){
        return stepBuilderFactory.get("callsImportStep")
                // представляется верным, что chunk size - это эквивалент commit interval
                 .<List<Call>, List<Call>>chunk(1)
-               // .reader(callsReader)
+                //.reader(callsReaderCustom)
                 .reader(callsReader)
                 .processor(itemProcessor)
                 .writer(writer)

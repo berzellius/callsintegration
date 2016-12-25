@@ -19,6 +19,7 @@ public class AmoCRMAuthResponse {
         this.response = response;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public class AuthData{
         public Boolean auth;
         public ArrayList<AmoCRMAccount> accounts;
