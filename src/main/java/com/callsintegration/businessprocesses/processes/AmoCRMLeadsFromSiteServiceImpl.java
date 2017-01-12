@@ -1,14 +1,19 @@
-package com.callsintegration.service;
+package com.callsintegration.businessprocesses.processes;
 
+import com.callsintegration.businessprocesses.rules.BusinessRulesValidator;
 import com.callsintegration.dmodel.CallTrackingSourceCondition;
 import com.callsintegration.dmodel.LeadFromSite;
 import com.callsintegration.dmodel.Site;
-import com.callsintegration.dto.api.amocrm.*;
+import com.callsintegration.dto.api.amocrm.AmoCRMContact;
+import com.callsintegration.dto.api.amocrm.AmoCRMCustomField;
+import com.callsintegration.dto.api.amocrm.AmoCRMLead;
 import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedEntityResponse;
 import com.callsintegration.dto.site.Lead;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.LeadFromSiteRepository;
 import com.callsintegration.repository.SiteRepository;
+import com.callsintegration.service.AmoCRMService;
+import com.callsintegration.service.CallTrackingSourceConditionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +73,9 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     @Autowired
     SiteRepository siteRepository;
+
+    @Autowired
+    BusinessRulesValidator businessRulesValidator;
 
 
 
@@ -130,6 +138,17 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     @Override
     public LeadFromSite processLeadFromSite(LeadFromSite leadFromSite) throws APIAuthException {
+        if(!businessRulesValidator.validate(leadFromSite)){
+            log.error("LeadFromSite object has not validated!");
+            leadFromSite.setState(LeadFromSite.State.DONE);
+            leadFromSiteRepository.save(leadFromSite);
+
+            return leadFromSite;
+        }
+        else{
+            log.info("LeadFromSite was succesfully validated!");
+        }
+
         if(leadFromSite.getSite() != null && leadFromSite.getLead() != null) {
             log.info("Started processing lead from site " + leadFromSite.getSite().getUrl() + "; contacts: " + leadFromSite.getLead().getPhone() + " / " + leadFromSite.getLead().getEmail());
 

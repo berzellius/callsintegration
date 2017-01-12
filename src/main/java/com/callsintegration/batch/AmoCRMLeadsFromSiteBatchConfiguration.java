@@ -3,8 +3,7 @@ package com.callsintegration.batch;
 import com.callsintegration.dto.api.amocrm.AmoCRMLead;
 import com.callsintegration.reader.AmoCRMLeadsQueryReader;
 import com.callsintegration.reader.ResetableItemReader;
-import com.callsintegration.service.AmoCRMLeadsFromSiteService;
-import com.callsintegration.service.AmoCRMService;
+import com.callsintegration.businessprocesses.processes.AmoCRMLeadsFromSiteService;
 import com.callsintegration.writer.AmoCRMUpdatedLeadsWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -12,7 +11,6 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;

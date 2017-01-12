@@ -3,7 +3,6 @@ package com.callsintegration.web;
 import com.callsintegration.dto.site.CallRequest;
 import com.callsintegration.dto.site.LeadRequest;
 import com.callsintegration.dto.site.Result;
-import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.CallsService;
 import com.callsintegration.service.WebhookService;
 import javassist.NotFoundException;
@@ -51,8 +50,7 @@ public class RestController extends BaseController {
             @RequestBody
             CallRequest callRequest
     ) throws NotFoundException {
-        System.out.println("webhook! " + callRequest.toString());
-        throw new NotFoundException("out of service!");
-        //return webhookService.newCallFromWebhook(callRequest);
+        //throw new NotFoundException("out of service!");
+        return webhookService.newCallFromWebhook(callRequest);
     }
 }

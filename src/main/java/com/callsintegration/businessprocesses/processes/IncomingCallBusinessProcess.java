@@ -1,4 +1,4 @@
-package com.callsintegration.service;
+package com.callsintegration.businessprocesses.processes;
 
 import com.callsintegration.dmodel.Call;
 import org.springframework.stereotype.Service;

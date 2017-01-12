@@ -6,7 +6,6 @@ import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.scheduling.ScheduledTasks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,8 @@ public class WebhookServiceImpl implements WebhookService {
     public Result newCallFromWebhook(CallRequest callRequest) {
         List<Call> calls = callRequest.getCalls();
 
-        if(calls != null){
+        if(calls != null && calls.size() > 0){
+            System.out.println("webhook! " + callRequest.toString());
             processCalls(calls);
             scheduledTasks.runImportCallsToCRM();
         }

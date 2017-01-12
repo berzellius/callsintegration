@@ -3,7 +3,7 @@ package com.callsintegration.batch;
 import com.callsintegration.dmodel.Call;
 import com.callsintegration.service.AmoCRMService;
 import com.callsintegration.service.CallTrackingAPIService;
-import com.callsintegration.service.IncomingCallBusinessProcess;
+import com.callsintegration.businessprocesses.processes.IncomingCallBusinessProcess;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;

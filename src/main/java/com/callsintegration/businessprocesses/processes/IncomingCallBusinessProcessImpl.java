@@ -1,5 +1,6 @@
-package com.callsintegration.service;
+package com.callsintegration.businessprocesses.processes;
 
+import com.callsintegration.businessprocesses.rules.BusinessRulesValidator;
 import com.callsintegration.dmodel.Call;
 import com.callsintegration.dmodel.Site;
 import com.callsintegration.dto.api.amocrm.*;
@@ -9,16 +10,12 @@ import com.callsintegration.dto.api.amocrm.response.AmoCRMCreatedLeadsResponse;
 import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.repository.SiteRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.callsintegration.service.AmoCRMService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.swing.*;
 import javax.transaction.Transactional;
 import java.util.*;
 
@@ -37,6 +34,9 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
 
     @Autowired
     SiteRepository siteRepository;
+
+    @Autowired
+    BusinessRulesValidator businessRulesValidator;
 
     private static final boolean CREATE_TASK_FOR_EACH_CALL = true;
     private static final boolean CREATE_LEAD_IF_ABSENT = true;
@@ -91,7 +91,13 @@ public class IncomingCallBusinessProcessImpl implements IncomingCallBusinessProc
         log.info("Work with new call from number: " + call.getNumber());
 
         try {
-            processCall(call);
+            if(businessRulesValidator.validate(call)) {
+                log.info("Call was succesfully validated!");
+                processCall(call);
+            }
+            else{
+                log.error("Call object has not pass validation!");
+            }
             call.setState(Call.State.DONE);
             callRepository.save(call);
         } catch (APIAuthException e) {

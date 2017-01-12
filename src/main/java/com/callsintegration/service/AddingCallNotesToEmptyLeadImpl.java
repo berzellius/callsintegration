@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by berz on 06.11.2015.
@@ -23,7 +22,9 @@ public class AddingCallNotesToEmptyLeadImpl implements AddingCallNotesToEmptyLea
 
     private Long phoneNumberCustomFieldLeads;
 
+    // todo: what the fuck is this?
     @Override
+    @Deprecated
     public void start(){
         System.out.println("Start AddingCallNotesToEmptyLead");
 

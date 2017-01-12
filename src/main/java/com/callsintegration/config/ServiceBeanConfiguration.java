@@ -1,6 +1,11 @@
 package com.callsintegration.config;
 
 
+import com.callsintegration.businessprocesses.processes.AmoCRMLeadsFromSiteService;
+import com.callsintegration.businessprocesses.processes.AmoCRMLeadsFromSiteServiceImpl;
+import com.callsintegration.businessprocesses.processes.IncomingCallBusinessProcess;
+import com.callsintegration.businessprocesses.processes.IncomingCallBusinessProcessImpl;
+import com.callsintegration.businessprocesses.rules.*;
 import com.callsintegration.dto.api.ErrorHandlers.AmoCRMAPIRequestErrorHandler;
 import com.callsintegration.dto.api.ErrorHandlers.CalltrackingAPIRequestErrorHandler;
 import com.callsintegration.interceptors.AddTemplatesDataInterceptor;
@@ -8,7 +13,6 @@ import com.callsintegration.scheduling.ScheduledTasks;
 import com.callsintegration.scheduling.ScheduledTasksImpl;
 import com.callsintegration.service.*;
 import com.callsintegration.settings.APISettings;
-import com.callsintegration.settings.LocalProjectSettings;
 import com.callsintegration.settings.ProjectSettings;
 import com.callsintegration.settings.RemoteProjectSettings;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +25,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * Created by berz on 20.10.14.
@@ -218,6 +224,26 @@ public class ServiceBeanConfiguration {
     @Bean
     WebhookService webhookService(){
         return new WebhookServiceImpl();
+    }
+
+    @Bean
+    BusinessRulesValidator businessRulesValidator(){
+        return new BusinessRulesValidatorImpl();
+    }
+
+    @Bean
+    IncomingCallValidationUtil incomingCallValidationUtil(){
+        return new IncomingCallValidationUtilImpl();
+    }
+
+    @Bean
+    LeadFromSiteValidationUtil leadFromSiteValidationUtil(){
+        return new LeadFromSiteValidationUtilImpl();
+    }
+
+    @Bean
+    SimpleFieldsValidationUtil simpleFieldsValidationUtil(){
+        return new SimpleFieldValidationUtilImpl();
     }
 
 }

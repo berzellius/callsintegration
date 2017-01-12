@@ -1,27 +1,16 @@
 package com.callsintegration.web;
 
-import com.callsintegration.dmodel.Call;
-import com.callsintegration.dmodel.CallTrackingSourceCondition;
-import com.callsintegration.dto.api.amocrm.AmoCRMContact;
-import com.callsintegration.dto.api.amocrm.AmoCRMContactsLeadsLink;
-import com.callsintegration.dto.api.amocrm.response.AmoCRMContactsResponse;
-import com.callsintegration.dto.api.calltracking.CallTrackingWebsiteSources;
-import com.callsintegration.exception.APIAuthException;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.service.AmoCRMService;
 import com.callsintegration.service.CallTrackingAPIService;
 import com.callsintegration.service.CallTrackingSourceConditionService;
-import com.callsintegration.service.IncomingCallBusinessProcess;
-import com.callsintegration.specifications.CallSpecifications;
+import com.callsintegration.businessprocesses.processes.IncomingCallBusinessProcess;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
 
 /**
  * Created by berz on 20.09.2015.

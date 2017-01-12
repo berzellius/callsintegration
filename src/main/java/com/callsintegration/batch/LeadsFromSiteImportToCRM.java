@@ -1,7 +1,7 @@
 package com.callsintegration.batch;
 
 import com.callsintegration.dmodel.LeadFromSite;
-import com.callsintegration.service.AmoCRMLeadsFromSiteService;
+import com.callsintegration.businessprocesses.processes.AmoCRMLeadsFromSiteService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;

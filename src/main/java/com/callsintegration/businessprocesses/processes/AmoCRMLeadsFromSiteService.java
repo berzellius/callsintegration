@@ -1,4 +1,4 @@
-package com.callsintegration.service;
+package com.callsintegration.businessprocesses.processes;
 
 import com.callsintegration.dmodel.LeadFromSite;
 import com.callsintegration.dto.api.amocrm.AmoCRMLead;
