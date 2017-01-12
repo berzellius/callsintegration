@@ -138,16 +138,6 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
 
     @Override
     public LeadFromSite processLeadFromSite(LeadFromSite leadFromSite) throws APIAuthException {
-        if(!businessRulesValidator.validate(leadFromSite)){
-            log.error("LeadFromSite object has not validated!");
-            leadFromSite.setState(LeadFromSite.State.DONE);
-            leadFromSiteRepository.save(leadFromSite);
-
-            return leadFromSite;
-        }
-        else{
-            log.info("LeadFromSite was succesfully validated!");
-        }
 
         if(leadFromSite.getSite() != null && leadFromSite.getLead() != null) {
             log.info("Started processing lead from site " + leadFromSite.getSite().getUrl() + "; contacts: " + leadFromSite.getLead().getPhone() + " / " + leadFromSite.getLead().getEmail());
@@ -155,6 +145,17 @@ public class AmoCRMLeadsFromSiteServiceImpl implements AmoCRMLeadsFromSiteServic
             // Приводим номер к общему формату
             if(leadFromSite.getLead().getPhone() != null){
                 leadFromSite.getLead().setPhone("7" + this.phoneExec(leadFromSite.getLead().getPhone()));
+            }
+
+            if(!businessRulesValidator.validate(leadFromSite)){
+                log.error("LeadFromSite object has not validated!");
+                leadFromSite.setState(LeadFromSite.State.DONE);
+                leadFromSiteRepository.save(leadFromSite);
+
+                return leadFromSite;
+            }
+            else{
+                log.info("LeadFromSite was succesfully validated!");
             }
 
             String utmSource = (leadFromSite.getLead().getUtm_source() != null)? leadFromSite.getLead().getUtm_source() : "";
