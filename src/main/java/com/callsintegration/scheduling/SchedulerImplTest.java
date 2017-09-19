@@ -11,7 +11,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -111,7 +110,7 @@ public class SchedulerImplTest implements MainScheduler {
         }
     }
 
-    //@Scheduled(fixedDelay = 10000)
+    @Scheduled(fixedDelay = 10000)
     public void runCallsImport(){
 
         JobParametersBuilder jobParametersBuilder = new JobParametersBuilder();

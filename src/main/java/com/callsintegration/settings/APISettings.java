@@ -61,10 +61,10 @@ public class APISettings {
     *
     * Calltracking
     */
-    public static String CallTrackingLogin = "timonina@elektro-karniz.ru";
-    public static String CallTrackingPassword = "CiMaa438569ERi";
-    public static String CallTrackingWebLogin = "timonina@elektro-karniz.ru";
-    public static String CallTrackingWebPassword = "CiMaa438569ERi";
+    public static String CallTrackingLogin = "info@elektro-karniz.ru";
+    public static String CallTrackingPassword = "call456KL";
+    public static String CallTrackingWebLogin = "info@elektro-karniz.ru";
+    public static String CallTrackingWebPassword = "call456KL";
     public static String CallTrackingLoginUrl = "https://calltracking.ru/admin/login";
     public static String CallTrackingAPIUrl = "https://calltracking.ru/api/get_data.php";
     public static String CallTrackingAPILoginUrl = "https://calltracking.ru/api/login.php";

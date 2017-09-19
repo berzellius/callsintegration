@@ -64,8 +64,14 @@ public class NewCallsToCRMBatchConfiguration {
         return new ItemProcessor<Call, Call>() {
             @Override
             public Call process(Call call) throws Exception {
-                incomingCallBusinessProcess.newIncomingCall(call);
-                return call;
+                try {
+                    incomingCallBusinessProcess.newIncomingCall(call);
+                    return call;
+                }
+                catch(RuntimeException e){
+                    e.printStackTrace();
+                    throw e;
+                }
             }
         };
     }

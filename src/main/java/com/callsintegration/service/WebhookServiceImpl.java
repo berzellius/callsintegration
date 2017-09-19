@@ -5,6 +5,8 @@ import com.callsintegration.dto.site.CallRequest;
 import com.callsintegration.dto.site.Result;
 import com.callsintegration.repository.CallRepository;
 import com.callsintegration.scheduling.ScheduledTasks;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class WebhookServiceImpl implements WebhookService {
     @Autowired
     CallTrackingAPIService callTrackingAPIService;
 
+    private static final Logger log = LoggerFactory.getLogger(WebhookServiceImpl.class);
+
 
     /*
     *
@@ -33,6 +37,9 @@ public class WebhookServiceImpl implements WebhookService {
      */
     @Override
     public Result newCallFromWebhook(CallRequest callRequest) {
+        log.info("we dont need to do whatever, just endup processing");
+        return new Result("success");
+        /*
         List<Call> calls = callRequest.getCalls();
 
         if(calls != null && calls.size() > 0){
@@ -41,12 +48,13 @@ public class WebhookServiceImpl implements WebhookService {
             scheduledTasks.runImportCallsToCRM();
         }
 
-        return new Result("success");
+        return new Result("success");*/
     }
 
 
     @Transactional
     private void processCalls(List<Call> calls){
+
         for(Call call : calls){
             if(call.getCaller() == null || call.getCaller().equals("")){
                 call.setCaller("unknown");

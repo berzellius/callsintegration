@@ -5,22 +5,13 @@ import com.callsintegration.dmodel.CallTrackingSourceCondition;
 import com.callsintegration.dto.api.ErrorHandlers.APIRequestErrorException;
 import com.callsintegration.dto.api.calltracking.*;
 import com.callsintegration.exception.APIAuthException;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -30,12 +21,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
-import org.apache.http.HttpClientConnection.*;
-
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -154,6 +139,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
 
         List<MediaType> mediaTypes = new ArrayList<MediaType>();
         mediaTypes.add(MediaType.TEXT_HTML);
+        mediaTypes.add(MediaType.APPLICATION_JSON);
 
         List<MediaType> formsMediaTypes = new ArrayList<MediaType>();
         formsMediaTypes.add(MediaType.APPLICATION_FORM_URLENCODED);
@@ -289,7 +275,7 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
     }
 
     private void websiteLogIn() throws APIAuthException {
-        this.reLogins = 0;
+        /*this.reLogins = 0;
 
         while (!this.checkWebsiteLoggedIn()) {
             System.out.println("loggin in..");
@@ -322,6 +308,33 @@ public class CallTrackingAPIServiceImpl implements CallTrackingAPIService {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+
+            this.reLogins++;
+        }*/
+        this.reLogins = 0;
+
+        while (!this.checkWebsiteLoggedIn()) {
+            System.out.println("loggin in..");
+            if(this.reLogins > this.reLoginsMax){
+                throw new APIAuthException("cant login to calltracking website");
+            }
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders requestHeaders = new HttpHeaders();
+            requestHeaders.add("Content-type", MediaType.APPLICATION_FORM_URLENCODED_VALUE);
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("login", this.getWebSiteLogin());
+            params.add("password", this.getWebSitePassword());
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, requestHeaders);
+            this.cookies = new LinkedList<>();
+            HttpEntity<String> response = restTemplate.exchange(this.getWebSiteLoginUrl(), HttpMethod.POST, request, String.class);
+            HttpHeaders httpHeaders = response.getHeaders();
+            if(httpHeaders.containsKey("Set-Cookie")){
+                for(String cookie : httpHeaders.get("Set-Cookie")){
+                    this.cookies.add(cookie.split(";")[0]);
+                }
             }
 
             this.reLogins++;
